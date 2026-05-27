@@ -44,10 +44,13 @@ function Landing() {
           <Sparkles className="w-3.5 h-3.5 text-primary" />
           AI-powered • Privacy first
         </div>
-        <h1 className="text-[2.6rem] leading-[1.05] font-display font-semibold tracking-tight">
-          Track calories <br />
-          like it's <span className="gradient-text">2030.</span>
+        <h1 className="text-[2.75rem] leading-[1.02] font-display font-bold tracking-tight uppercase">
+          We build <br />
+          <span className="gradient-text-aurora">AI-driven</span> <br />
+          calorie tracking <br />
+          people <span className="italic font-display font-medium normal-case text-muted-foreground">care about.</span>
         </h1>
+
         <p className="mt-4 text-[15px] text-muted-foreground leading-relaxed">
           Snap a photo, say what you ate, or scan a barcode.
           CalorieFlow AI logs everything in seconds — and nudges you to the gym.

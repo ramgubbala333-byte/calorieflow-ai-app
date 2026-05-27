@@ -14,150 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      ai_chat_history: {
-        Row: {
-          content:    string
-          created_at: string
-          id:         string
-          role:       "user" | "assistant"
-          user_id:    string
-        }
-        Insert: {
-          content:    string
-          created_at?: string
-          id?:        string
-          role:       "user" | "assistant"
-          user_id:    string
-        }
-        Update: {
-          content?:   string
-          created_at?: string
-          id?:        string
-          role?:      "user" | "assistant"
-          user_id?:   string
-        }
-        Relationships: []
-      }
-      audit_logs: {
-        Row: {
-          action:     string
-          created_at: string
-          details:    Json | null
-          id:         string
-          ip_address: string | null
-          user_id:    string | null
-        }
-        Insert: {
-          action:     string
-          created_at?: string
-          details?:   Json | null
-          id?:        string
-          ip_address?: string | null
-          user_id?:   string | null
-        }
-        Update: {
-          action?:    string
-          created_at?: string
-          details?:   Json | null
-          id?:        string
-          ip_address?: string | null
-          user_id?:   string | null
-        }
-        Relationships: []
-      }
-      barcode_cache: {
-        Row: {
-          barcode:              string
-          brand:                string | null
-          cached_at:            string
-          calories_per_serving: number | null
-          carbs:                number | null
-          fat:                  number | null
-          fiber:                number | null
-          image_url:            string | null
-          product_name:         string
-          protein:              number | null
-          serving_size:         number | null
-          serving_unit:         string | null
-          sodium:               number | null
-          sugar:                number | null
-        }
-        Insert: {
-          barcode:              string
-          brand?:               string | null
-          cached_at?:           string
-          calories_per_serving?: number | null
-          carbs?:               number | null
-          fat?:                 number | null
-          fiber?:               number | null
-          image_url?:           string | null
-          product_name:         string
-          protein?:             number | null
-          serving_size?:        number | null
-          serving_unit?:        string | null
-          sodium?:              number | null
-          sugar?:               number | null
-        }
-        Update: {
-          barcode?:             string
-          brand?:               string | null
-          cached_at?:           string
-          calories_per_serving?: number | null
-          carbs?:               number | null
-          fat?:                 number | null
-          fiber?:               number | null
-          image_url?:           string | null
-          product_name?:        string
-          protein?:             number | null
-          serving_size?:        number | null
-          serving_unit?:        string | null
-          sodium?:              number | null
-          sugar?:               number | null
-        }
-        Relationships: []
-      }
-      daily_summaries: {
-        Row: {
-          goal_met:        boolean | null
-          id:              string
-          meals_logged:    number | null
-          summary_date:    string
-          total_calories:  number | null
-          total_carbs:     number | null
-          total_fat:       number | null
-          total_protein:   number | null
-          updated_at:      string
-          user_id:         string
-          workout_minutes: number | null
-        }
-        Insert: {
-          goal_met?:        boolean | null
-          id?:              string
-          meals_logged?:    number | null
-          summary_date:     string
-          total_calories?:  number | null
-          total_carbs?:     number | null
-          total_fat?:       number | null
-          total_protein?:   number | null
-          updated_at?:      string
-          user_id:          string
-          workout_minutes?: number | null
-        }
-        Update: {
-          goal_met?:        boolean | null
-          id?:              string
-          meals_logged?:    number | null
-          summary_date?:    string
-          total_calories?:  number | null
-          total_carbs?:     number | null
-          total_fat?:       number | null
-          total_protein?:   number | null
-          updated_at?:      string
-          user_id?:         string
-          workout_minutes?: number | null
-        }
-        Relationships: []
-      }
       daily_activity: {
         Row: {
           active_calories: number | null
@@ -462,70 +318,55 @@ export type Database = {
       }
       profiles: {
         Row: {
-          activity_level:  string | null
-          age:             number | null
-          avatar_url:      string | null
-          created_at:      string
-          display_name:    string | null
-          email:           string | null
-          energy_unit:     string | null
+          activity_level: string | null
+          age: number | null
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          energy_unit: string | null
           food_preference: string | null
-          gender:          string | null
-          goal_type:       string | null
-          goal_weight:     number | null
-          height_cm:       number | null
-          id:              string
-          onboarded:       boolean | null
-          timezone:        string | null
-          units:           string | null
-          updated_at:      string
-          user_id:         string
-          week_start_day:  number | null
-          weight_kg:       number | null
+          height_cm: number | null
+          id: string
+          onboarded: boolean | null
+          units: string | null
+          updated_at: string
+          user_id: string
+          weight_kg: number | null
         }
         Insert: {
-          activity_level?:  string | null
-          age?:             number | null
-          avatar_url?:      string | null
-          created_at?:      string
-          display_name?:    string | null
-          email?:           string | null
-          energy_unit?:     string | null
+          activity_level?: string | null
+          age?: number | null
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          energy_unit?: string | null
           food_preference?: string | null
-          gender?:          string | null
-          goal_type?:       string | null
-          goal_weight?:     number | null
-          height_cm?:       number | null
-          id?:              string
-          onboarded?:       boolean | null
-          timezone?:        string | null
-          units?:           string | null
-          updated_at?:      string
-          user_id:          string
-          week_start_day?:  number | null
-          weight_kg?:       number | null
+          height_cm?: number | null
+          id?: string
+          onboarded?: boolean | null
+          units?: string | null
+          updated_at?: string
+          user_id: string
+          weight_kg?: number | null
         }
         Update: {
-          activity_level?:  string | null
-          age?:             number | null
-          avatar_url?:      string | null
-          created_at?:      string
-          display_name?:    string | null
-          email?:           string | null
-          energy_unit?:     string | null
+          activity_level?: string | null
+          age?: number | null
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          energy_unit?: string | null
           food_preference?: string | null
-          gender?:          string | null
-          goal_type?:       string | null
-          goal_weight?:     number | null
-          height_cm?:       number | null
-          id?:              string
-          onboarded?:       boolean | null
-          timezone?:        string | null
-          units?:           string | null
-          updated_at?:      string
-          user_id?:         string
-          week_start_day?:  number | null
-          weight_kg?:       number | null
+          height_cm?: number | null
+          id?: string
+          onboarded?: boolean | null
+          units?: string | null
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number | null
         }
         Relationships: []
       }
@@ -589,168 +430,6 @@ export type Database = {
         }
         Relationships: []
       }
-      notification_tokens: {
-        Row: {
-          created_at: string
-          id:         string
-          platform:   "ios" | "android" | "web"
-          token:      string
-          user_id:    string
-        }
-        Insert: {
-          created_at?: string
-          id?:         string
-          platform:    "ios" | "android" | "web"
-          token:       string
-          user_id:     string
-        }
-        Update: {
-          created_at?: string
-          id?:         string
-          platform?:   "ios" | "android" | "web"
-          token?:      string
-          user_id?:    string
-        }
-        Relationships: []
-      }
-      privacy_settings: {
-        Row: {
-          ai_features_enabled:    boolean | null
-          ai_scan_on_demand_only: boolean | null
-          created_at:             string
-          data_training_opt_out:  boolean | null
-          id:                     string
-          share_anonymous_stats:  boolean | null
-          updated_at:             string
-          user_id:                string
-        }
-        Insert: {
-          ai_features_enabled?:    boolean | null
-          ai_scan_on_demand_only?: boolean | null
-          created_at?:             string
-          data_training_opt_out?:  boolean | null
-          id?:                     string
-          share_anonymous_stats?:  boolean | null
-          updated_at?:             string
-          user_id:                 string
-        }
-        Update: {
-          ai_features_enabled?:    boolean | null
-          ai_scan_on_demand_only?: boolean | null
-          created_at?:             string
-          data_training_opt_out?:  boolean | null
-          id?:                     string
-          share_anonymous_stats?:  boolean | null
-          updated_at?:             string
-          user_id?:                string
-        }
-        Relationships: []
-      }
-      progress_photos: {
-        Row: {
-          created_at:   string
-          id:           string
-          note:         string | null
-          storage_path: string
-          taken_at:     string
-          user_id:      string
-          weight_kg:    number | null
-        }
-        Insert: {
-          created_at?:  string
-          id?:          string
-          note?:        string | null
-          storage_path: string
-          taken_at?:    string
-          user_id:      string
-          weight_kg?:   number | null
-        }
-        Update: {
-          created_at?:  string
-          id?:          string
-          note?:        string | null
-          storage_path?: string
-          taken_at?:    string
-          user_id?:     string
-          weight_kg?:   number | null
-        }
-        Relationships: []
-      }
-      reminders: {
-        Row: {
-          created_at:     string
-          days_of_week:   number[]
-          enabled:        boolean | null
-          id:             string
-          message:        string | null
-          scheduled_time: string
-          title:          string
-          type:           string
-          updated_at:     string
-          user_id:        string
-        }
-        Insert: {
-          created_at?:     string
-          days_of_week?:   number[]
-          enabled?:        boolean | null
-          id?:             string
-          message?:        string | null
-          scheduled_time:  string
-          title:           string
-          type:            string
-          updated_at?:     string
-          user_id:         string
-        }
-        Update: {
-          created_at?:     string
-          days_of_week?:   number[]
-          enabled?:        boolean | null
-          id?:             string
-          message?:        string | null
-          scheduled_time?: string
-          title?:          string
-          type?:           string
-          updated_at?:     string
-          user_id?:        string
-        }
-        Relationships: []
-      }
-      streaks: {
-        Row: {
-          id:                      string
-          last_log_date:           string | null
-          last_workout_date:       string | null
-          logging_streak:          number | null
-          longest_logging_streak:  number | null
-          longest_workout_streak:  number | null
-          updated_at:              string
-          user_id:                 string
-          workout_streak:          number | null
-        }
-        Insert: {
-          id?:                      string
-          last_log_date?:           string | null
-          last_workout_date?:       string | null
-          logging_streak?:          number | null
-          longest_logging_streak?:  number | null
-          longest_workout_streak?:  number | null
-          updated_at?:              string
-          user_id:                  string
-          workout_streak?:          number | null
-        }
-        Update: {
-          id?:                      string
-          last_log_date?:           string | null
-          last_workout_date?:       string | null
-          logging_streak?:          number | null
-          longest_logging_streak?:  number | null
-          longest_workout_streak?:  number | null
-          updated_at?:              string
-          user_id?:                 string
-          workout_streak?:          number | null
-        }
-        Relationships: []
-      }
       templates: {
         Row: {
           created_at: string
@@ -772,69 +451,6 @@ export type Database = {
           meals?: Json
           name?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      weight_logs: {
-        Row: {
-          created_at: string
-          id:         string
-          logged_at:  string
-          note:       string | null
-          user_id:    string
-          weight_kg:  number
-        }
-        Insert: {
-          created_at?: string
-          id?:         string
-          logged_at?:  string
-          note?:       string | null
-          user_id:     string
-          weight_kg:   number
-        }
-        Update: {
-          created_at?: string
-          id?:         string
-          logged_at?:  string
-          note?:       string | null
-          user_id?:    string
-          weight_kg?:  number
-        }
-        Relationships: []
-      }
-      workout_plans: {
-        Row: {
-          active:        boolean | null
-          created_at:    string
-          days_of_week:  number[]
-          id:            string
-          name:          string
-          reminder_time: string
-          updated_at:    string
-          user_id:       string
-          workout_type:  string | null
-        }
-        Insert: {
-          active?:        boolean | null
-          created_at?:    string
-          days_of_week?:  number[]
-          id?:            string
-          name:           string
-          reminder_time?: string
-          updated_at?:    string
-          user_id:        string
-          workout_type?:  string | null
-        }
-        Update: {
-          active?:        boolean | null
-          created_at?:    string
-          days_of_week?:  number[]
-          id?:            string
-          name?:          string
-          reminder_time?: string
-          updated_at?:    string
-          user_id?:       string
-          workout_type?:  string | null
         }
         Relationships: []
       }

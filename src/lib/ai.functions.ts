@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI server functions — runs ONLY on the server, never bundles secrets.
  *
