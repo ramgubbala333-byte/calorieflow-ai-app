@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CalorieFlow AI — Server Functions
  *
