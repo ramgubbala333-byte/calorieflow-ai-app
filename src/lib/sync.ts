@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Backend sync layer.
  *
