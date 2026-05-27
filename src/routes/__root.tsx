@@ -123,12 +123,14 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
+      <AnimatedBackground />
       <SyncBootstrap />
       <Outlet />
       <SonnerToaster />
     </QueryClientProvider>
   );
 }
+
 
 function SyncBootstrap() {
   const router = useRouter();
