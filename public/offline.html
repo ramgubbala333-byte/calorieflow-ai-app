@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Offline · CalorieFlow AI</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0; min-height: 100vh; display: grid; place-items: center;
+        background: radial-gradient(ellipse at top, #14213d 0%, #0a1220 60%);
+        color: #e6edf7; font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+        padding: 1.5rem; text-align: center;
+      }
+      h1 { font-size: 1.5rem; margin: 1rem 0 0.5rem; }
+      p { color: #93a3bd; max-width: 22rem; line-height: 1.5; }
+      .badge { width: 64px; height: 64px; border-radius: 20px;
+        background: linear-gradient(135deg, #3b82f6, #10b981);
+        display: grid; place-items: center; font-size: 28px; }
+      a { color: #60a5fa; margin-top: 1.25rem; display: inline-block; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div class="badge">📶</div>
+      <h1>You're offline</h1>
+      <p>Your meals and progress are saved locally. Reconnect to sync with the cloud.</p>
+      <a href="/today">Retry</a>
+    </div>
+  </body>
+</html>
