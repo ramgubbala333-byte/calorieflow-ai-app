@@ -24,10 +24,21 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 function Today() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const allMeals = useStore(() => getMeals());
+  const goals = useStore(() => getGoals());
+  const profile = useStore(() => getProfile());
+  const activity = useHealth(() => getTodayActivity());
+  const weight = useHealth(() => getLatestWeight());
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10);
+  const [selectedDate, setSelectedDate] = useState(todayStr);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
   }, [user, loading, navigate]);
+
+  const googleName = user?.user_metadata?.full_name ?? user?.user_metadata?.name;
+  const firstName = (profile.name ?? googleName)?.split(" ")[0] ?? "there";
 
   if (loading) {
     return (
@@ -36,18 +47,6 @@ function Today() {
       </div>
     );
   }
-
-  const allMeals = useStore(() => getMeals());
-  const goals = useStore(() => getGoals());
-  const profile = useStore(() => getProfile());
-  const googleName = user?.user_metadata?.full_name ?? user?.user_metadata?.name;
-  const firstName = (profile.name ?? googleName)?.split(" ")[0] ?? "there";
-  const activity = useHealth(() => getTodayActivity());
-  const weight = useHealth(() => getLatestWeight());
-
-  const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10);
-  const [selectedDate, setSelectedDate] = useState(todayStr);
 
   const meals = allMeals.filter(
     (m) => m.loggedDate === selectedDate || (!m.loggedDate && selectedDate === todayStr),
