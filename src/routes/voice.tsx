@@ -27,7 +27,7 @@ function Voice() {
   const [items, setItems] = useState<SearchFood[]>([]);
   const [textMode, setTextMode] = useState(!hasSpeechAPI);
   const [textInput, setTextInput] = useState("");
-  const recognitionRef = useRef<InstanceType<SpeechRecognitionType> | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     return () => {

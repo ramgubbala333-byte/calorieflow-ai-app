@@ -376,10 +376,9 @@ export async function syncWeight(platform: HealthPlatform): Promise<SyncedWeight
 
 // ---------- React hook ----------
 
+if (typeof window !== "undefined") seedIfEmpty();
+
 export function useHealth<T>(selector: () => T): T {
-  useEffect(() => {
-    seedIfEmpty();
-  }, []);
   return useSyncExternalStore(subscribe, selector, selector);
 }
 
