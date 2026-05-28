@@ -4,6 +4,9 @@ import { PageHeader } from "@/components/PageHeader";
 import { Check, Sparkles, Crown, Zap, ShieldCheck, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
+import { setSubscription } from "@/lib/store";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/subscription")({
   head: () => ({ meta: [{ title: "Subscription · CalorieFlow AI" }] }),
@@ -37,23 +40,76 @@ const features = [
 
 function Subscription() {
   const nav = useNavigate();
+  const { user } = useAuth();
   const [picked, setPicked] = useState("yearly");
   const [starting, setStarting] = useState(false);
   const [restoring, setRestoring] = useState(false);
 
   const startTrial = async () => {
+    // Must be signed in to start a trial
+    if (!user) {
+      nav({ to: "/signup" });
+      return;
+    }
     setStarting(true);
-    await new Promise((r) => setTimeout(r, 700));
-    setStarting(false);
-    toast.success("Trial started", { description: `7 days of Pro on the ${picked} plan` });
-    nav({ to: "/today" });
+    try {
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 7);
+      const periodEnd = trialEnd.toISOString();
+
+      const { error } = await supabase.from("subscriptions").upsert(
+        {
+          user_id: user.id,
+          tier: picked,
+          status: "trialing",
+          current_period_end: periodEnd,
+        },
+        { onConflict: "user_id" },
+      );
+
+      if (error) throw error;
+
+      // Mirror to local store so Today page shows premium immediately
+      setSubscription({ tier: picked, status: "trialing", currentPeriodEnd: periodEnd });
+
+      const planLabel = plans.find((p) => p.id === picked)?.name ?? picked;
+      toast.success("7-day free trial started!", {
+        description: `${planLabel} plan active until ${trialEnd.toLocaleDateString(undefined, { month: "short", day: "numeric" })}. No charge until then.`,
+      });
+      nav({ to: "/today" });
+    } catch (e) {
+      toast.error("Couldn't start trial. Please try again.");
+    } finally {
+      setStarting(false);
+    }
   };
 
   const restore = async () => {
+    if (!user) {
+      nav({ to: "/login" });
+      return;
+    }
     setRestoring(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setRestoring(false);
-    toast.success("Purchases restored");
+    try {
+      const { data } = await supabase
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data) {
+        setSubscription({ tier: data.tier, status: data.status, currentPeriodEnd: data.current_period_end ?? null });
+        toast.success("Subscription restored", { description: `${data.tier} · ${data.status}` });
+      } else {
+        toast.info("No previous purchase found.");
+      }
+    } catch {
+      toast.error("Restore failed. Try again.");
+    } finally {
+      setRestoring(false);
+    }
   };
 
   return (
@@ -126,11 +182,11 @@ function Subscription() {
           className="mt-6 w-full h-14 rounded-2xl gradient-primary text-primary-foreground font-semibold glow-strong inline-flex items-center justify-center gap-2 disabled:opacity-60"
         >
           {starting && <Loader2 className="w-4 h-4 animate-spin" />}
-          Start 7-day free trial
+          {user ? "Start 7-day free trial" : "Sign up to start free trial"}
         </button>
 
         <p className="mt-3 text-center text-[11px] text-muted-foreground">
-          Then $39/year. Auto-renews. Manage anytime in Settings.
+          Then {picked === "yearly" ? "$39/year" : "$4.99/month"}. Auto-renews. Manage anytime in Settings.
         </p>
 
         <div className="mt-5 flex items-center justify-center gap-4 text-[11px] text-muted-foreground pb-8">

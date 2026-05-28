@@ -22,12 +22,12 @@ function bootstrap() {
   if (bootstrapped) return;
   bootstrapped = true;
 
-  // 1. Synchronous subscription FIRST so we never miss an event.
+  // Subscribe first so we never miss an event.
   supabase.auth.onAuthStateChange((_event, session) => {
     emit({ user: session?.user ?? null, session, loading: false });
   });
 
-  // 2. Then hydrate.
+  // Then hydrate (also processes #access_token hash on OAuth callback).
   supabase.auth.getSession().then(({ data }) => {
     emit({ user: data.session?.user ?? null, session: data.session, loading: false });
   });
@@ -68,13 +68,26 @@ export function useAuth(): AuthState & {
       return { error: error?.message };
     },
     signInWithGoogle: async () => {
-      const res = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: typeof window !== "undefined" ? window.location.origin : undefined,
-      });
-      if (res.error) {
-        return { error: res.error instanceof Error ? res.error.message : String(res.error) };
+      // Try Lovable auth first (works when deployed on lovable.app)
+      try {
+        const res = await lovable.auth.signInWithOAuth("google", {
+          redirect_uri: typeof window !== "undefined" ? window.location.origin : undefined,
+        });
+        if (!res.error) return {};
+        // Lovable auth returned an error — fall through to Supabase direct
+      } catch {
+        // Lovable auth threw — fall through to Supabase direct
       }
-      return {};
+
+      // Fallback: use Supabase OAuth directly (standard redirect flow)
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
+        },
+      });
+      if (error) return { error: error.message };
+      return {}; // browser is redirecting
     },
     signOut: async () => {
       await supabase.auth.signOut();

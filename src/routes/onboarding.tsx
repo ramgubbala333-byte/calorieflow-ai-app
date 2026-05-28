@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowRight, Check, ChevronLeft } from "lucide-react";
 import { setProfile, setGoals, setOnboarded } from "@/lib/store";
+import { useAuth } from "@/hooks/use-auth";
 
 function calcTDEE(a: Record<string, string>): { calories: number; protein: number; carbs: number; fat: number } {
   const weight = parseFloat(a.weight) || 75;
@@ -40,6 +41,7 @@ const steps: Step[] = [
 
 function Onboarding() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const total = steps.length;
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -76,11 +78,12 @@ function Onboarding() {
     });
     setGoals(macros);
     setOnboarded(true);
-    navigate({ to: "/today" });
+    // If already signed in go straight to dashboard, otherwise prompt to create account
+    navigate({ to: user ? "/today" : "/signup" });
   };
 
   return (
-    <div className="mx-auto max-w-md min-h-screen px-5 pt-[max(env(safe-area-inset-top),1.5rem)] pb-[max(env(safe-area-inset-bottom),1rem)] flex flex-col">
+    <div className="mx-auto max-w-md min-h-[100dvh] px-5 pt-[max(env(safe-area-inset-top),1.5rem)] pb-[max(env(safe-area-inset-bottom),1rem)] flex flex-col">
       {/* progress */}
       <div className="flex items-center gap-3 mb-6">
         {step > 0 && !done && (
@@ -123,8 +126,7 @@ function Onboarding() {
             <div className="mt-8">
               <div className="glass-strong rounded-2xl p-5 flex items-baseline gap-3">
                 <input
-                  autoFocus
-                  inputMode="decimal"
+                  inputMode="numeric"
                   placeholder={current.placeholder}
                   value={answers[current.key] ?? ""}
                   onChange={(e) => setVal(current.key, e.target.value.replace(/[^0-9.]/g, ""))}
@@ -159,8 +161,11 @@ function Onboarding() {
               onClick={finish}
               className="mt-8 inline-flex items-center gap-2 h-14 px-8 rounded-2xl gradient-primary text-primary-foreground font-semibold glow-strong"
             >
-              Open dashboard <ArrowRight className="w-4 h-4" />
+              {user ? "Open dashboard" : "Create your account"} <ArrowRight className="w-4 h-4" />
             </button>
+            {!user && (
+              <p className="mt-3 text-xs text-muted-foreground">Your settings are saved locally and will sync once you sign in.</p>
+            )}
           </div>
         </div>
       )}

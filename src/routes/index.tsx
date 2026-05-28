@@ -37,7 +37,7 @@ function Landing() {
       {/* nav */}
       <header className="px-5 pt-[max(env(safe-area-inset-top),1rem)] flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="w-9 h-9 rounded-xl gradient-primary grid place-items-center text-primary-foreground font-bold glow">C</span>
+          <span className="w-9 h-9 rounded-xl gradient-primary grid place-items-center text-primary-foreground font-bold text-xs glow">CF</span>
           <span className="font-display font-semibold tracking-tight">CalorieFlow</span>
         </div>
         <Link
