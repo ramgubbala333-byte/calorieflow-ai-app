@@ -85,7 +85,7 @@
  * with native bridge calls (mobile) or OAuth-backed `createServerFn` calls
  * (Fitbit/Garmin/Samsung) when the native shell ships.
  */
-import { useEffect, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
 export type HealthPlatform =
   | "apple_health"
