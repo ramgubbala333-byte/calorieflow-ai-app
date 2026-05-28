@@ -3,6 +3,7 @@ export type Meal = {
   name: string;
   type: "Breakfast" | "Lunch" | "Dinner" | "Snack";
   time: string;
+  loggedDate?: string; // YYYY-MM-DD — added for per-day filtering
   calories: number;
   protein: number;
   carbs: number;

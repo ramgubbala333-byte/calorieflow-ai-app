@@ -98,6 +98,7 @@ export function startSync(h: Hydrators) {
             name: m.name,
             type: m.meal_type as Meal["type"],
             time: m.time_label ?? new Date(m.logged_at).toISOString().slice(11, 16),
+            loggedDate: new Date(m.logged_at).toISOString().slice(0, 10),
             calories: m.calories,
             protein: Number(m.protein),
             carbs: Number(m.carbs),

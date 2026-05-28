@@ -90,6 +90,7 @@ export function addMeal(m: Omit<Meal, "id"> & { id?: string }) {
   const meal: Meal = {
     ...m,
     id: m.id ?? `m-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    loggedDate: m.loggedDate ?? new Date().toISOString().slice(0, 10),
   };
   setMeals([...getMeals(), meal]);
   pushMealInsert(meal);

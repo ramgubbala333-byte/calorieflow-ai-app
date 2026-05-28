@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { MiniRing } from "@/components/Progress";
 import { getGoals, getMeals, getProfile, useStore } from "@/lib/store";
@@ -37,13 +37,26 @@ function Today() {
     );
   }
 
-  const meals = useStore(() => getMeals());
+  const allMeals = useStore(() => getMeals());
   const goals = useStore(() => getGoals());
   const profile = useStore(() => getProfile());
   const googleName = user?.user_metadata?.full_name ?? user?.user_metadata?.name;
   const firstName = (profile.name ?? googleName)?.split(" ")[0] ?? "there";
   const activity = useHealth(() => getTodayActivity());
   const weight = useHealth(() => getLatestWeight());
+
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10);
+  const [selectedDate, setSelectedDate] = useState(todayStr);
+
+  const meals = allMeals.filter(
+    (m) => m.loggedDate === selectedDate || (!m.loggedDate && selectedDate === todayStr),
+  );
+
+  const todayIdx = now.getDay();
+  const todayDate = now.getDate();
+  const weekStart = todayDate - todayIdx;
+
   const totals = meals.reduce(
     (a, m) => ({
       calories: a.calories + m.calories,
@@ -53,11 +66,6 @@ function Today() {
     }),
     { calories: 0, protein: 0, carbs: 0, fat: 0 },
   );
-
-  const now = new Date();
-  const todayIdx = now.getDay();
-  const todayDate = now.getDate();
-  const weekStart = todayDate - todayIdx;
 
   const caloriePct = Math.min(1, totals.calories / (goals.calories || 1));
   const calorieCircum = 2 * Math.PI * 70;
@@ -73,7 +81,7 @@ function Today() {
         </Link>
         <div className="flex items-center gap-1.5">
           <span className="flex items-center gap-1 px-2.5 h-8 rounded-full glass text-xs font-semibold">
-            <Flame className="w-3.5 h-3.5 text-[var(--warning)]" /> {meals.length > 0 ? 1 : 0}
+            <Flame className="w-3.5 h-3.5 text-[var(--warning)]" /> {allMeals.filter(m => m.loggedDate === todayStr || (!m.loggedDate)).length > 0 ? 1 : 0}
           </span>
           <ThemeToggle />
           <button aria-label="Notifications" className="w-9 h-9 rounded-full glass grid place-items-center">
@@ -89,23 +97,36 @@ function Today() {
       <section className="px-3 mt-1">
         <div className="flex justify-between gap-1">
           {DAYS.map((d, i) => {
-            const date = weekStart + i;
+            const dayDate = new Date(now.getFullYear(), now.getMonth(), weekStart + i);
+            const dateNum = weekStart + i;
+            const dateStr = dayDate.toISOString().slice(0, 10);
             const isToday = i === todayIdx;
             const isPast = i < todayIdx;
+            const isSelected = dateStr === selectedDate;
+            const hasMeals = allMeals.some((m) => m.loggedDate === dateStr);
             return (
-              <div key={d} className="flex-1 flex flex-col items-center gap-1.5">
-                <span className={`text-[10px] font-medium ${isToday ? "text-foreground" : "text-muted-foreground"}`}>{d}</span>
+              <button
+                key={d}
+                onClick={() => setSelectedDate(dateStr)}
+                className="flex-1 flex flex-col items-center gap-1.5"
+              >
+                <span className={`text-[10px] font-medium ${isSelected ? "text-primary" : isToday ? "text-foreground" : "text-muted-foreground"}`}>{d}</span>
                 <div
-                  className={`w-10 h-10 rounded-full grid place-items-center text-sm font-semibold border-2 transition-colors
-                    ${isToday
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : isPast
-                        ? "border-success/60 text-foreground"
-                        : "border-dashed border-foreground/15 text-muted-foreground"}`}
+                  className={`w-10 h-10 rounded-full grid place-items-center text-sm font-semibold border-2 transition-colors relative
+                    ${isSelected
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : isToday
+                        ? "border-primary bg-primary/10 text-foreground"
+                        : isPast
+                          ? "border-success/60 text-foreground"
+                          : "border-dashed border-foreground/15 text-muted-foreground"}`}
                 >
-                  {date > 0 ? date : ""}
+                  {dateNum > 0 ? dateNum : ""}
+                  {hasMeals && !isSelected && (
+                    <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-primary" />
+                  )}
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -227,7 +248,9 @@ function Today() {
       {/* recently uploaded */}
       <section className="px-5 mt-6 pb-32">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold">Recently uploaded</h2>
+          <h2 className="text-sm font-semibold">
+            {selectedDate === todayStr ? "Today's meals" : new Date(selectedDate + "T00:00").toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}
+          </h2>
           <Link to="/diary" className="text-xs text-primary font-medium">Open diary</Link>
         </div>
         {meals.length === 0 ? (

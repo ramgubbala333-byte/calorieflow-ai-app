@@ -20,6 +20,7 @@ import {
   connectFitbit,
   connectGarmin,
   connectSamsungHealth,
+  connectZepp,
   disconnectHealthProvider,
   syncDailyActivity,
   syncWorkouts,
@@ -39,6 +40,7 @@ const connectMap: Record<HealthPlatform, () => Promise<unknown>> = {
   fitbit: connectFitbit,
   garmin: connectGarmin,
   samsung_health: connectSamsungHealth,
+  zepp: connectZepp,
 };
 
 function HealthPage() {
