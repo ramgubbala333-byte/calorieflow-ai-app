@@ -11,6 +11,7 @@ import {
 import {
   getTodayActivity, getLatestWeight, getLastSyncTime, formatRelative, useHealth,
 } from "@/lib/health";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/today")({
   head: () => ({ meta: [{ title: "Today · CalorieFlow AI" }] }),
