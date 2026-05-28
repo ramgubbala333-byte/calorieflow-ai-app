@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { getHealthSettings, setHealthSettings, useHealth, getConnections, formatRelative, getLastSyncTime } from "@/lib/health";
+import { useAuth } from "@/hooks/use-auth";
+import { getProfile, getGoals, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings · CalorieFlow AI" }] }),
@@ -44,6 +46,13 @@ function Segmented<T extends string>({ value, options, onChange }: { value: T; o
 }
 
 function Settings() {
+  const { user, signOut } = useAuth();
+  const profile = useStore(() => getProfile());
+  const goals = useStore(() => getGoals());
+  const displayName = profile.name ?? user?.email?.split("@")[0] ?? "You";
+  const displayEmail = profile.email ?? user?.email ?? "";
+  const avatarChar = (displayName[0] ?? "U").toUpperCase();
+
   const [reminders, setReminders] = useState(true);
   const [weekStart, setWeekStart] = useState<"Sun" | "Mon" | "Custom">("Mon");
   const [units, setUnits] = useState<"kg" | "lb">("kg");
@@ -56,7 +65,6 @@ function Settings() {
   const connectedCount = connections.filter((c) => c.status === "connected").length;
   const updateHS = (patch: Partial<typeof hs>) => setHealthSettings({ ...hs, ...patch });
 
-
   return (
     <AppShell>
       <PageHeader title="Settings" subtitle="Account & preferences" />
@@ -64,12 +72,12 @@ function Settings() {
       <div className="px-4 pt-4 space-y-4">
         {/* profile */}
         <div className="glass-strong rounded-2xl p-4 flex items-center gap-3">
-          <div className="w-14 h-14 rounded-full gradient-primary grid place-items-center text-primary-foreground font-bold text-xl glow">R</div>
-          <div className="flex-1">
-            <p className="font-semibold">Ram</p>
-            <p className="text-xs text-muted-foreground">ram@calorieflow.app</p>
+          <div className="w-14 h-14 rounded-full gradient-primary grid place-items-center text-primary-foreground font-bold text-xl glow">{avatarChar}</div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold truncate">{displayName}</p>
+            <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
           </div>
-          <Link to="/subscription" className="text-xs font-semibold px-3 py-1.5 rounded-full gradient-primary text-primary-foreground glow inline-flex items-center gap-1">
+          <Link to="/subscription" className="text-xs font-semibold px-3 py-1.5 rounded-full gradient-primary text-primary-foreground glow inline-flex items-center gap-1 shrink-0">
             <Crown className="w-3 h-3" /> Pro
           </Link>
         </div>
@@ -87,8 +95,8 @@ function Settings() {
         </Link>
 
         <Section title="Goals">
-          <Row icon={Target} label="Daily calories" value="2,200 kcal" />
-          <Row icon={Target} label="Protein target" value="165 g" />
+          <Row icon={Target} label="Daily calories" value={`${goals.calories.toLocaleString()} kcal`} />
+          <Row icon={Target} label="Protein target" value={`${goals.protein} g`} />
           <Row icon={User} label="Body metrics" value="Edit" />
           <RowCustom icon={Flame} label="Calc method">
             <Segmented value={calcMethod} options={["Mifflin", "Harris", "Katch"]} onChange={setCalcMethod} />
@@ -151,7 +159,10 @@ function Settings() {
           </Link>
         </Section>
 
-        <button className="w-full h-12 rounded-2xl glass text-sm font-medium text-muted-foreground inline-flex items-center justify-center gap-2">
+        <button
+          onClick={() => signOut()}
+          className="w-full h-12 rounded-2xl glass text-sm font-medium text-muted-foreground inline-flex items-center justify-center gap-2"
+        >
           <LogOut className="w-4 h-4" /> Sign out
         </button>
 

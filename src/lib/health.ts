@@ -92,7 +92,8 @@ export type HealthPlatform =
   | "google_health_connect"
   | "fitbit"
   | "garmin"
-  | "samsung_health";
+  | "samsung_health"
+  | "zepp";
 
 export type ConnectionStatus = "connected" | "disconnected" | "error" | "pending";
 export type SyncStatus = "success" | "partial" | "failed" | "permission_denied";
@@ -166,6 +167,7 @@ export const PLATFORM_META: Record<
   fitbit: { label: "Fitbit", emoji: "⌚", vendor: "Fitbit Web API", native: "oauth" },
   garmin: { label: "Garmin", emoji: "🏃", vendor: "Garmin Connect API", native: "oauth" },
   samsung_health: { label: "Samsung Health", emoji: "📱", vendor: "Samsung Health SDK", native: "android" },
+  zepp: { label: "Zepp / Amazfit", emoji: "⌚", vendor: "Zepp Health API", native: "oauth" },
 };
 
 // ---------- Persistence ----------
@@ -218,66 +220,29 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
-const seedConnections: HealthConnection[] = [
-  {
-    platform: "apple_health",
-    status: "connected",
-    lastSyncedAt: Date.now() - 1000 * 60 * 12,
-    scopes: ["steps", "active_calories", "workouts", "weight"],
-  },
+const defaultConnections: HealthConnection[] = [
+  { platform: "apple_health", status: "disconnected", lastSyncedAt: null, scopes: [] },
   { platform: "google_health_connect", status: "disconnected", lastSyncedAt: null, scopes: [] },
   { platform: "fitbit", status: "disconnected", lastSyncedAt: null, scopes: [] },
   { platform: "garmin", status: "disconnected", lastSyncedAt: null, scopes: [] },
   { platform: "samsung_health", status: "disconnected", lastSyncedAt: null, scopes: [] },
-];
-
-const seedActivity: DailyActivity = {
-  date: todayStr(),
-  platform: "apple_health",
-  steps: 7842,
-  activeCalories: 412,
-  workoutMinutes: 48,
-  lastSyncedAt: Date.now() - 1000 * 60 * 12,
-};
-
-const seedWorkouts: Workout[] = [
-  {
-    id: "w-1",
-    platform: "apple_health",
-    workoutType: "Upper Body Strength",
-    workoutStartTime: Date.now() - 1000 * 60 * 60 * 3,
-    workoutEndTime: Date.now() - 1000 * 60 * 60 * 2,
-    activeCalories: 312,
-    completed: true,
-  },
-];
-
-const seedWeights: SyncedWeight[] = [
-  {
-    id: "wt-1",
-    platform: "apple_health",
-    weightKg: 74.2,
-    measuredAt: Date.now() - 1000 * 60 * 60 * 8,
-  },
+  { platform: "zepp", status: "disconnected", lastSyncedAt: null, scopes: [] },
 ];
 
 function seedIfEmpty() {
   if (!isBrowser) return;
-  if (localStorage.getItem(KEYS.connections) === null) write(KEYS.connections, seedConnections);
-  if (localStorage.getItem(KEYS.activity) === null) write(KEYS.activity, [seedActivity]);
-  if (localStorage.getItem(KEYS.workouts) === null) write(KEYS.workouts, seedWorkouts);
-  if (localStorage.getItem(KEYS.weights) === null) write(KEYS.weights, seedWeights);
+  if (localStorage.getItem(KEYS.connections) === null) write(KEYS.connections, defaultConnections);
   if (localStorage.getItem(KEYS.settings) === null) write(KEYS.settings, defaultSettings);
 }
 
 // ---------- Getters ----------
 
-export const getConnections = (): HealthConnection[] => read(KEYS.connections, seedConnections);
-export const getActivity = (): DailyActivity[] => read(KEYS.activity, [seedActivity]);
+export const getConnections = (): HealthConnection[] => read(KEYS.connections, defaultConnections);
+export const getActivity = (): DailyActivity[] => read(KEYS.activity, []);
 export const getTodayActivity = (): DailyActivity | undefined =>
-  getActivity().find((a) => a.date === todayStr()) ?? getActivity()[0];
-export const getWorkouts = (): Workout[] => read(KEYS.workouts, seedWorkouts);
-export const getWeights = (): SyncedWeight[] => read(KEYS.weights, seedWeights);
+  getActivity().find((a) => a.date === todayStr());
+export const getWorkouts = (): Workout[] => read(KEYS.workouts, []);
+export const getWeights = (): SyncedWeight[] => read(KEYS.weights, []);
 export const getLogs = (): HealthSyncLog[] => read(KEYS.logs, []);
 export const getHealthSettings = (): HealthSettings => read(KEYS.settings, defaultSettings);
 export const setHealthSettings = (s: HealthSettings) => write(KEYS.settings, s);
@@ -356,6 +321,7 @@ export const connectGoogleHealthConnect = () => mockConnect("google_health_conne
 export const connectFitbit = () => mockConnect("fitbit");
 export const connectGarmin = () => mockConnect("garmin");
 export const connectSamsungHealth = () => mockConnect("samsung_health");
+export const connectZepp = () => mockConnect("zepp");
 
 export async function disconnectHealthProvider(platform: HealthPlatform) {
   await delay(400);
@@ -435,8 +401,9 @@ export function hydrateHealth(data: {
   workouts: Workout[];
   weights: SyncedWeight[];
 }) {
-  if (data.connections.length) write(KEYS.connections, data.connections);
-  if (data.activity.length) write(KEYS.activity, data.activity);
-  if (data.workouts.length) write(KEYS.workouts, data.workouts);
-  if (data.weights.length) write(KEYS.weights, data.weights);
+  // Always write — even empty arrays clear stale mock data
+  write(KEYS.connections, data.connections.length ? data.connections : defaultConnections);
+  write(KEYS.activity, data.activity);
+  write(KEYS.workouts, data.workouts);
+  write(KEYS.weights, data.weights);
 }

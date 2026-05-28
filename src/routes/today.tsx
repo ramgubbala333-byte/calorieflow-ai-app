@@ -40,7 +40,8 @@ function Today() {
   const meals = useStore(() => getMeals());
   const goals = useStore(() => getGoals());
   const profile = useStore(() => getProfile());
-  const firstName = profile.name?.split(" ")[0] ?? user?.email?.split("@")[0] ?? "there";
+  const googleName = user?.user_metadata?.full_name ?? user?.user_metadata?.name;
+  const firstName = (profile.name ?? googleName)?.split(" ")[0] ?? "there";
   const activity = useHealth(() => getTodayActivity());
   const weight = useHealth(() => getLatestWeight());
   const totals = meals.reduce(

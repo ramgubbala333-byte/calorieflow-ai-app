@@ -1,6 +1,22 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowRight, Check, ChevronLeft } from "lucide-react";
+import { setProfile, setGoals, setOnboarded } from "@/lib/store";
+
+function calcTDEE(a: Record<string, string>): { calories: number; protein: number; carbs: number; fat: number } {
+  const weight = parseFloat(a.weight) || 75;
+  const height = parseFloat(a.height) || 175;
+  const age = parseFloat(a.age) || 28;
+  const bmr = 10 * weight + 6.25 * height - 5 * age - 78;
+  const mult: Record<string, number> = { "Sedentary": 1.2, "Lightly active": 1.375, "Active": 1.55, "Very active": 1.725 };
+  const tdee = Math.round(bmr * (mult[a.activity] ?? 1.375));
+  const adj: Record<string, number> = { "Lose fat": -500, "Build muscle": 250 };
+  const calories = Math.max(1200, tdee + (adj[a.goal] ?? 0));
+  const protein = Math.round(parseFloat(a.protein) || weight * 1.8);
+  const fat = Math.round(calories * 0.25 / 9);
+  const carbs = Math.max(0, Math.round((calories - protein * 4 - fat * 9) / 4));
+  return { calories, protein, carbs, fat };
+}
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({ meta: [{ title: "Get started · CalorieFlow AI" }] }),
@@ -23,6 +39,7 @@ const steps: Step[] = [
 ];
 
 function Onboarding() {
+  const navigate = useNavigate();
   const total = steps.length;
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -43,6 +60,23 @@ function Onboarding() {
   const selectChoice = (k: string, v: string) => {
     setVal(k, v);
     setTimeout(next, 200);
+  };
+
+  const finish = () => {
+    const macros = calcTDEE(answers);
+    const activityMap: Record<string, "sedentary" | "light" | "moderate" | "active" | "athlete"> = {
+      "Sedentary": "sedentary", "Lightly active": "light", "Active": "active", "Very active": "athlete",
+    };
+    setProfile({
+      age: parseFloat(answers.age) || undefined,
+      heightCm: parseFloat(answers.height) || undefined,
+      weightKg: parseFloat(answers.weight) || undefined,
+      activity: activityMap[answers.activity],
+      foodPreference: answers.food,
+    });
+    setGoals(macros);
+    setOnboarded(true);
+    navigate({ to: "/today" });
   };
 
   return (
@@ -118,15 +152,15 @@ function Onboarding() {
             </div>
             <h2 className="mt-6 text-3xl font-display font-semibold">You're all set</h2>
             <p className="mt-3 text-sm text-muted-foreground max-w-xs mx-auto">
-              We tuned your daily target to <b className="text-foreground">2,200 kcal</b> and{" "}
-              <b className="text-foreground">{answers.protein || 165}g protein</b>.
+              We tuned your daily target to <b className="text-foreground">{calcTDEE(answers).calories.toLocaleString()} kcal</b> and{" "}
+              <b className="text-foreground">{calcTDEE(answers).protein}g protein</b>.
             </p>
-            <Link
-              to="/today"
+            <button
+              onClick={finish}
               className="mt-8 inline-flex items-center gap-2 h-14 px-8 rounded-2xl gradient-primary text-primary-foreground font-semibold glow-strong"
             >
               Open dashboard <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
         </div>
       )}
