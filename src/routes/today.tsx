@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { EmptyState } from "@/components/EmptyState";
 import {
   Camera, Mic, Barcode, Plus, Flame, Dumbbell, Bell, Settings as SettingsIcon, Utensils,
-  Drumstick, Wheat, Droplet,
+  Drumstick, Wheat, Droplet, Loader2,
 } from "lucide-react";
 import {
   getTodayActivity, getLatestWeight, useHealth,
@@ -29,6 +29,14 @@ function Today() {
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
   }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen grid place-items-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
 
   const meals = useStore(() => getMeals());
   const goals = useStore(() => getGoals());
@@ -59,12 +67,12 @@ function Today() {
   return (
     <AppShell>
       <header className="px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <span className="w-9 h-9 rounded-2xl gradient-primary grid place-items-center text-primary-foreground glow">
             <Flame className="w-4 h-4" />
           </span>
           <h1 className="text-xl font-display font-semibold tracking-tight">Hey, {firstName} 👋</h1>
-        </div>
+        </Link>
         <div className="flex items-center gap-1.5">
           <span className="flex items-center gap-1 px-2.5 h-8 rounded-full glass text-xs font-semibold">
             <Flame className="w-3.5 h-3.5 text-[var(--warning)]" /> {streaks.logging}

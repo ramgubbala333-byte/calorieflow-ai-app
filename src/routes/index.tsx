@@ -1,4 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useAuth } from "@/hooks/use-auth";
 import { Sparkles, Camera, Mic, Barcode, Dumbbell, ShieldCheck, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -22,6 +24,14 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect authenticated users (e.g. after Google OAuth callback lands on root)
+  useEffect(() => {
+    if (!loading && user) navigate({ to: "/today" });
+  }, [user, loading, navigate]);
+
   return (
     <div className="mx-auto max-w-md min-h-screen relative">
       {/* nav */}

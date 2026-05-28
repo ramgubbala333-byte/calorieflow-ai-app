@@ -6,7 +6,7 @@
  */
 import { useEffect, useSyncExternalStore } from "react";
 import type { Meal } from "./mock-data";
-import { todayMeals as seedMeals, goals as seedGoals } from "./mock-data";
+import { goals as seedGoals } from "./mock-data";
 import {
   pushMealInsert,
   pushMealUpdate,
@@ -77,12 +77,11 @@ export type TrashedMeal = Meal & { deletedAt: number };
 
 function seedIfEmpty() {
   if (!isBrowser) return;
-  if (localStorage.getItem(KEYS.meals) === null) write(KEYS.meals, seedMeals);
   if (localStorage.getItem(KEYS.goals) === null) write(KEYS.goals, seedGoals);
 }
 
 export function getMeals(): Meal[] {
-  return read<Meal[]>(KEYS.meals, seedMeals);
+  return read<Meal[]>(KEYS.meals, []);
 }
 export function setMeals(meals: Meal[]) {
   write(KEYS.meals, meals);
@@ -182,7 +181,7 @@ export type Profile = {
   foodPreference?: string;
 };
 export function getProfile(): Profile {
-  return read<Profile>(KEYS.profile, { name: "Ram", email: "ram@calorieflow.app" });
+  return read<Profile>(KEYS.profile, {});
 }
 export function setProfile(p: Profile) {
   write(KEYS.profile, p);
