@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { PageHeader } from "@/components/PageHeader";
-import { addMeal, getFavorites, getTemplates, toggleFavorite, useStore } from "@/lib/store";
+import { addMeal, getFavorites, getMeals, getTemplates, toggleFavorite, useStore } from "@/lib/store";
 import { searchFoods, type SearchFood } from "@/lib/api";
 import { EmptyState, LoadingState } from "@/components/EmptyState";
 import { Search, Plus, Bookmark, Mic, Barcode, Camera, Star, Clock, Utensils, Wand2, X, Inbox } from "lucide-react";
@@ -14,13 +14,6 @@ export const Route = createFileRoute("/add-food")({
 });
 
 type Tab = "Results" | "Recent" | "Favorites" | "My Meals";
-
-const recents: SearchFood[] = [
-  { name: "Greek Yogurt Bowl", serving: "1 bowl", kcal: 380, p: 28, c: 42, f: 9 },
-  { name: "Cold Brew + Oat Milk", serving: "350 ml", kcal: 90, p: 2, c: 12, f: 3 },
-  { name: "Grilled Chicken Salad", serving: "1 plate", kcal: 520, p: 44, c: 28, f: 22 },
-  { name: "Protein Smoothie", serving: "400 ml", kcal: 240, p: 26, c: 22, f: 4 },
-];
 
 function emojiFor(name: string) {
   const n = name.toLowerCase();
@@ -42,6 +35,7 @@ function AddFood() {
   const navigate = useNavigate();
   const favorites = useStore(() => getFavorites());
   const templates = useStore(() => getTemplates());
+  const allMeals = useStore(() => getMeals());
   const [tab, setTab] = useState<Tab>("Results");
   const [q, setQ] = useState("");
   const [meal, setMeal] = useState<"Breakfast" | "Lunch" | "Dinner" | "Snack">("Lunch");
@@ -70,6 +64,18 @@ function AddFood() {
     };
   }, [q, tab]);
 
+  const recents: SearchFood[] = useMemo(() =>
+    [...allMeals].reverse().slice(0, 8).map((m) => ({
+      name: m.name,
+      serving: "1 serving",
+      kcal: m.calories,
+      p: m.protein,
+      c: m.carbs,
+      f: m.fat,
+    })),
+    [allMeals],
+  );
+
   const list: SearchFood[] = useMemo(() => {
     if (tab === "Recent") return recents;
     if (tab === "Favorites") return favorites;
@@ -78,7 +84,7 @@ function AddFood() {
         t.meals.map((m) => ({ name: m.name, serving: "1 serving", kcal: m.calories, p: m.protein, c: m.carbs, f: m.fat })),
       );
     return results;
-  }, [tab, results, favorites, templates]);
+  }, [tab, results, favorites, templates, recents]);
 
   const logFood = (f: SearchFood) => {
     const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });

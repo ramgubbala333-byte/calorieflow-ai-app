@@ -94,7 +94,7 @@ export async function analyzeFoodImage(imageDataUrl?: string): Promise<{ items: 
   return { items: data.items, confidence: data.confidence };
 }
 
-export async function transcribeVoice(audioBase64?: string): Promise<{ transcript: string; items: SearchFood[] }> {
-  const data = await _transcribeVoice({ data: { audioBase64: audioBase64 ?? "" } });
+export async function transcribeVoice(opts?: { audioBase64?: string; transcript?: string }): Promise<{ transcript: string; items: SearchFood[] }> {
+  const data = await _transcribeVoice({ data: { audioBase64: opts?.audioBase64 ?? "", transcript: opts?.transcript } });
   return { transcript: data.transcript, items: data.items };
 }
