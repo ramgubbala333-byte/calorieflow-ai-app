@@ -2,12 +2,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { MiniRing } from "@/components/Progress";
-import { streaks, workouts } from "@/lib/mock-data";
 import { getGoals, getMeals, getProfile, useStore } from "@/lib/store";
 import { useAuth } from "@/hooks/use-auth";
 import { EmptyState } from "@/components/EmptyState";
 import {
-  Camera, Mic, Barcode, Plus, Flame, Dumbbell, Bell, Settings as SettingsIcon, Utensils,
+  Camera, Mic, Barcode, Plus, Flame, Bell, Settings as SettingsIcon, Utensils,
   Drumstick, Wheat, Droplet, Loader2,
 } from "lucide-react";
 import {
@@ -59,10 +58,8 @@ function Today() {
   const todayDate = now.getDate();
   const weekStart = todayDate - todayIdx;
 
-  const caloriePct = Math.min(1, totals.calories / goals.calories);
+  const caloriePct = Math.min(1, totals.calories / (goals.calories || 1));
   const calorieCircum = 2 * Math.PI * 70;
-
-  const nextWorkout = workouts.find((w) => !w.done);
 
   return (
     <AppShell>
@@ -75,7 +72,7 @@ function Today() {
         </Link>
         <div className="flex items-center gap-1.5">
           <span className="flex items-center gap-1 px-2.5 h-8 rounded-full glass text-xs font-semibold">
-            <Flame className="w-3.5 h-3.5 text-[var(--warning)]" /> {streaks.logging}
+            <Flame className="w-3.5 h-3.5 text-[var(--warning)]" /> {meals.length > 0 ? 1 : 0}
           </span>
           <ThemeToggle />
           <button aria-label="Notifications" className="w-9 h-9 rounded-full glass grid place-items-center">
@@ -225,25 +222,6 @@ function Today() {
         </Link>
       </section>
 
-      {/* workout reminder */}
-      {nextWorkout && (
-        <section className="px-5 mt-5">
-          <Link to="/workout" className="block glass-strong rounded-2xl p-4 relative overflow-hidden">
-            <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full gradient-primary opacity-20 blur-2xl" />
-            <div className="flex items-center gap-3 relative">
-              <div className="w-12 h-12 rounded-xl gradient-primary grid place-items-center glow">
-                <Dumbbell className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] text-primary font-medium">Up next · {nextWorkout.time}</p>
-                <h3 className="font-semibold text-sm truncate">{nextWorkout.title}</h3>
-                <p className="text-[11px] text-muted-foreground">{nextWorkout.duration}</p>
-              </div>
-              <button className="text-[11px] font-semibold px-3 py-1.5 rounded-full bg-foreground text-background">Start</button>
-            </div>
-          </Link>
-        </section>
-      )}
 
       {/* recently uploaded */}
       <section className="px-5 mt-6 pb-32">

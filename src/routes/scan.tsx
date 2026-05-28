@@ -94,7 +94,10 @@ function Scan() {
         }
       }
 
-      const r = await analyzeFoodImage(imageDataUrl || undefined);
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Scan timed out. Check your connection and try again.")), 30_000),
+      );
+      const r = await Promise.race([analyzeFoodImage(imageDataUrl || undefined), timeout]);
 
       if (!r.items.length) {
         toast.error("No food detected. Try pointing closer at your plate.");
@@ -106,9 +109,9 @@ function Scan() {
       setConfidence(r.confidence);
       setPhase("results");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Scan failed";
-      toast.error(msg);
-      setPhase("error");
+      const msg = err instanceof Error ? err.message : "Scan failed. Try again.";
+      toast.error(msg, { duration: 5000 });
+      setPhase("idle");
     }
   };
 
@@ -124,20 +127,30 @@ function Scan() {
       try {
         const reader = new FileReader();
         reader.onload = async (ev) => {
-          const imageDataUrl = ev.target?.result as string;
-          const r = await analyzeFoodImage(imageDataUrl);
-          if (!r.items.length) {
-            toast.error("No food detected in this photo.");
+          try {
+            const imageDataUrl = ev.target?.result as string;
+            const timeout = new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error("Scan timed out. Check your connection and try again.")), 30_000),
+            );
+            const r = await Promise.race([analyzeFoodImage(imageDataUrl), timeout]);
+            if (!r.items.length) {
+              toast.error("No food detected in this photo.");
+              setPhase("idle");
+              return;
+            }
+            setItems(r.items);
+            setConfidence(r.confidence);
+            setPhase("results");
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : "Scan failed. Try again.";
+            toast.error(msg, { duration: 5000 });
             setPhase("idle");
-            return;
           }
-          setItems(r.items);
-          setConfidence(r.confidence);
-          setPhase("results");
         };
         reader.readAsDataURL(file);
       } catch {
-        setPhase("error");
+        toast.error("Could not read the image. Try again.");
+        setPhase("idle");
       }
     };
     input.click();

@@ -4,7 +4,6 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
-  useRouter,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -136,16 +135,13 @@ function RootComponent() {
 
 
 function SyncBootstrap() {
-  const router = useRouter();
   useEffect(() => {
-    let unsub: (() => void) | undefined;
     let cancelled = false;
     Promise.all([
       import("@/lib/sync"),
       import("@/lib/store"),
       import("@/lib/health"),
-      import("@/integrations/supabase/client"),
-    ]).then(([sync, store, health, sb]) => {
+    ]).then(([sync, store, health]) => {
       if (cancelled) return;
       sync.startSync({
         meals: store.hydrateMeals,
@@ -157,13 +153,8 @@ function SyncBootstrap() {
         subscription: store.hydrateSubscription,
         health: health.hydrateHealth,
       });
-      const { data } = sb.supabase.auth.onAuthStateChange(() => router.invalidate());
-      unsub = () => data.subscription.unsubscribe();
     });
-    return () => {
-      cancelled = true;
-      unsub?.();
-    };
-  }, [router]);
+    return () => { cancelled = true; };
+  }, []);
   return null;
 }

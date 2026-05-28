@@ -74,10 +74,10 @@ function Landing() {
             Start free — 1 minute setup
           </Link>
           <Link
-            to="/today"
+            to="/login"
             className="h-12 rounded-2xl glass font-medium grid place-items-center text-foreground"
           >
-            Explore the app
+            Sign in to explore
           </Link>
         </div>
 
