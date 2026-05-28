@@ -31,7 +31,7 @@ function Landing() {
           <span className="font-display font-semibold tracking-tight">CalorieFlow</span>
         </div>
         <Link
-          to="/today"
+          to="/login"
           className="text-xs font-medium text-muted-foreground hover:text-foreground"
         >
           Sign in

@@ -86,9 +86,10 @@ async function callGateway(model: string, messages: unknown): Promise<{ items: F
 
 export const analyzeFoodImage = createServerFn({ method: "POST" })
   .inputValidator((input: { imageDataUrl: string }) =>
-    z.object({ imageDataUrl: z.string().min(1).max(8_000_000) }).parse(input),
+    z.object({ imageDataUrl: z.string().max(8_000_000) }).parse(input),
   )
   .handler(async ({ data }) => {
+    if (!data.imageDataUrl) return { items: [], confidence: 0 };
     const messages = [
       { role: "system", content: SYSTEM },
       {

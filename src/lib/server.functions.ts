@@ -38,7 +38,7 @@ async function auditLog(
   action: string,
   details: Record<string, unknown> = {},
 ) {
-  await supabaseAdmin.from("audit_logs").insert({ user_id: userId, action, details });
+  await supabaseAdmin.from("audit_logs").insert({ user_id: userId, action, details: details as unknown as Json });
 }
 
 // ---------------------------------------------------------------------------
@@ -65,9 +65,19 @@ export const copyYesterday = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!meals?.length) return { copied: 0, meals: [] };
 
-    const copies = meals.map(({ id: _id, created_at: _ca, logged_at: _la, ...rest }) => ({
-      ...rest,
-      logged_at: `${today}T${nowIso().slice(11)}`,
+    const copies = meals.map((m) => ({
+      user_id:    m.user_id,
+      name:       m.name,
+      emoji:      m.emoji,
+      meal_type:  m.meal_type,
+      time_label: m.time_label,
+      calories:   m.calories,
+      protein:    m.protein,
+      carbs:      m.carbs,
+      fat:        m.fat,
+      serving:    m.serving,
+      source:     m.source,
+      logged_at:  `${today}T${nowIso().slice(11)}`,
     }));
 
     const { data: inserted, error: insErr } = await supabase
@@ -104,9 +114,19 @@ export const copyWholeDay = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!meals?.length) return { copied: 0, meals: [] };
 
-    const copies = meals.map(({ id: _id, created_at: _ca, logged_at, ...rest }) => ({
-      ...rest,
-      logged_at: logged_at.replace(data.fromDate, data.toDate),
+    const copies = meals.map((m) => ({
+      user_id:    m.user_id,
+      name:       m.name,
+      emoji:      m.emoji,
+      meal_type:  m.meal_type,
+      time_label: m.time_label,
+      calories:   m.calories,
+      protein:    m.protein,
+      carbs:      m.carbs,
+      fat:        m.fat,
+      serving:    m.serving,
+      source:     m.source,
+      logged_at:  m.logged_at.replace(data.fromDate, data.toDate),
     }));
 
     const { data: inserted, error: insErr } = await supabase
@@ -157,7 +177,7 @@ export const addWeightLog = createServerFn({ method: "POST" })
       .eq("user_id", userId);
 
     // Refresh streak
-    await supabaseAdmin.rpc("refresh_streaks", { p_user_id: userId, p_type: "log" });
+    await supabaseAdmin.rpc("refresh_streaks" as never, { p_user_id: userId, p_type: "log" } as never);
 
     return log;
   });
@@ -308,7 +328,7 @@ export const logWorkout = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     // Refresh workout streak
-    await supabaseAdmin.rpc("refresh_streaks", { p_user_id: userId, p_type: "workout" });
+    await supabaseAdmin.rpc("refresh_streaks" as never, { p_user_id: userId, p_type: "workout" } as never);
 
     // Update daily summary
     const date = data.startTime.slice(0, 10);

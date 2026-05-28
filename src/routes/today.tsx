@@ -1,8 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { MiniRing } from "@/components/Progress";
-import { workouts } from "@/lib/mock-data";
-import { getGoals, getMeals, useStore } from "@/lib/store";
+import { streaks, workouts } from "@/lib/mock-data";
+import { getGoals, getMeals, getProfile, useStore } from "@/lib/store";
+import { useAuth } from "@/hooks/use-auth";
 import { EmptyState } from "@/components/EmptyState";
 import {
   Camera, Mic, Barcode, Plus, Flame, Dumbbell, Bell, Settings as SettingsIcon, Utensils,
@@ -21,8 +23,17 @@ export const Route = createFileRoute("/today")({
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function Today() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) navigate({ to: "/login" });
+  }, [user, loading, navigate]);
+
   const meals = useStore(() => getMeals());
   const goals = useStore(() => getGoals());
+  const profile = useStore(() => getProfile());
+  const firstName = profile.name?.split(" ")[0] ?? user?.email?.split("@")[0] ?? "there";
   const activity = useHealth(() => getTodayActivity());
   const weight = useHealth(() => getLatestWeight());
   const totals = meals.reduce(
@@ -52,11 +63,11 @@ function Today() {
           <span className="w-9 h-9 rounded-2xl gradient-primary grid place-items-center text-primary-foreground glow">
             <Flame className="w-4 h-4" />
           </span>
-          <h1 className="text-xl font-display font-semibold tracking-tight">CalorieFlow</h1>
+          <h1 className="text-xl font-display font-semibold tracking-tight">Hey, {firstName} 👋</h1>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="flex items-center gap-1 px-2.5 h-8 rounded-full glass text-xs font-semibold">
-            <Flame className="w-3.5 h-3.5 text-[var(--warning)]" /> 15
+            <Flame className="w-3.5 h-3.5 text-[var(--warning)]" /> {streaks.logging}
           </span>
           <ThemeToggle />
           <button aria-label="Notifications" className="w-9 h-9 rounded-full glass grid place-items-center">
