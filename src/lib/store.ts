@@ -4,7 +4,7 @@
  * When authenticated, mutations are mirrored to Supabase via `src/lib/sync.ts`.
  * When unauthenticated (demo / offline), everything stays in localStorage.
  */
-import { useEffect, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import type { Meal } from "./mock-data";
 import { goals as seedGoals } from "./mock-data";
 import {
@@ -248,10 +248,10 @@ export function deleteAllData() {
 
 // ---------- React hook ----------
 
+// Seed once at module load so the hook itself has a stable hook count.
+if (isBrowser) seedIfEmpty();
+
 export function useStore<T>(selector: () => T): T {
-  useEffect(() => {
-    seedIfEmpty();
-  }, []);
   return useSyncExternalStore(subscribe, selector, selector);
 }
 

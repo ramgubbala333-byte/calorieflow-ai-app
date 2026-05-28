@@ -85,7 +85,7 @@
  * with native bridge calls (mobile) or OAuth-backed `createServerFn` calls
  * (Fitbit/Garmin/Samsung) when the native shell ships.
  */
-import { useEffect, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
 export type HealthPlatform =
   | "apple_health"
@@ -376,10 +376,9 @@ export async function syncWeight(platform: HealthPlatform): Promise<SyncedWeight
 
 // ---------- React hook ----------
 
+if (typeof window !== "undefined") seedIfEmpty();
+
 export function useHealth<T>(selector: () => T): T {
-  useEffect(() => {
-    seedIfEmpty();
-  }, []);
   return useSyncExternalStore(subscribe, selector, selector);
 }
 
