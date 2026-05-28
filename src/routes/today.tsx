@@ -11,6 +11,7 @@ import {
 import {
   getTodayActivity, getLatestWeight, getLastSyncTime, formatRelative, useHealth,
 } from "@/lib/health";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/today")({
   head: () => ({ meta: [{ title: "Today · CalorieFlow AI" }] }),
@@ -45,6 +46,7 @@ function Today() {
           <h1 className="text-2xl font-display font-semibold leading-tight">Hey, Ram 👋</h1>
         </div>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <button aria-label="Notifications" className="w-10 h-10 rounded-full glass grid place-items-center">
             <Bell className="w-4 h-4" />
           </button>

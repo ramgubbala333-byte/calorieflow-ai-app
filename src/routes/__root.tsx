@@ -12,6 +12,7 @@ import {
 import appCss from "../styles.css?url";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
+import { ThemeBootstrap } from "@/components/ThemeToggle";
 
 function NotFoundComponent() {
   return (
@@ -124,6 +125,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeBootstrap />
       <AnimatedBackground />
       <SyncBootstrap />
       <Outlet />
