@@ -69,7 +69,7 @@ export function useAuth(): AuthState & {
     },
     signInWithGoogle: async () => {
       const callbackUrl = typeof window !== "undefined"
-        ? window.location.origin + "/auth/callback"
+        ? window.location.origin + "/auth-callback"
         : undefined;
 
       // Try Lovable auth first (works when deployed on lovable.app)
@@ -83,7 +83,7 @@ export function useAuth(): AuthState & {
         // Lovable auth threw — fall through to Supabase direct
       }
 
-      // Fallback: use Supabase OAuth directly (PKCE flow — redirects to /auth/callback?code=...)
+      // Fallback: use Supabase OAuth directly (PKCE flow — redirects to /auth-callback?code=...)
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {

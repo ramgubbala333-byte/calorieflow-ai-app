@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 
-export const Route = createFileRoute("/auth/callback")({
+export const Route = createFileRoute("/auth-callback")({
   head: () => ({ meta: [{ title: "Signing in… · CalorieFlow AI" }] }),
   component: AuthCallback,
 });
