@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 
 export type AuthState = {
   user: User | null;
@@ -124,16 +123,8 @@ export function useAuth(): AuthState & {
         ? window.location.origin + "/auth-callback"
         : undefined;
 
-      // Try Lovable auth first (works when deployed on lovable.app)
-      try {
-        const res = await lovable.auth.signInWithOAuth("google", {
-          redirect_uri: callbackUrl,
-        });
-        if (!res.error) return {};
-      } catch {
-        // fall through to Supabase direct
-      }
-
+      // Supabase direct OAuth — uses your Supabase project's Google OAuth
+      // config and triggers a full-page redirect to Google.
       try {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
