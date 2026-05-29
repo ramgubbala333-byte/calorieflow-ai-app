@@ -124,13 +124,13 @@ function Onboarding() {
             </div>
           ) : (
             <div className="mt-8">
-              <div className="glass-strong rounded-2xl p-5 flex items-baseline gap-3">
+              <div className="glass-strong rounded-2xl p-5 flex items-baseline gap-3 overflow-hidden">
                 <input
                   inputMode="numeric"
                   placeholder={current.placeholder}
                   value={answers[current.key] ?? ""}
                   onChange={(e) => setVal(current.key, e.target.value.replace(/[^0-9.]/g, ""))}
-                  className="flex-1 bg-transparent text-5xl font-display font-semibold tabular-nums focus:outline-none placeholder:text-muted-foreground/40"
+                  className="flex-1 min-w-0 bg-transparent text-5xl font-display font-semibold tabular-nums focus:outline-none placeholder:text-muted-foreground/40"
                 />
                 <span className="text-sm text-muted-foreground">{current.unit}</span>
               </div>
