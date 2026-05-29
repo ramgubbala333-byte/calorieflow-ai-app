@@ -17,20 +17,59 @@ function emit(next: AuthState) {
   listeners.forEach((l) => l(next));
 }
 
+function clearStaleAuthStorage() {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const keys: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && (k.startsWith("sb-") || k.startsWith("supabase."))) keys.push(k);
+    }
+    keys.forEach((k) => localStorage.removeItem(k));
+  } catch {
+    /* localStorage unavailable */
+  }
+}
+
 let bootstrapped = false;
 function bootstrap() {
   if (bootstrapped) return;
   bootstrapped = true;
 
-  // Subscribe first so we never miss an event.
-  supabase.auth.onAuthStateChange((_event, session) => {
-    emit({ user: session?.user ?? null, session, loading: false });
-  });
+  try {
+    supabase.auth.onAuthStateChange((_event, session) => {
+      try {
+        emit({ user: session?.user ?? null, session, loading: false });
+      } catch (e) {
+        console.error("[auth] onAuthStateChange emit failed", e);
+        emit({ user: null, session: null, loading: false });
+      }
+    });
+  } catch (e) {
+    console.error("[auth] subscribe failed", e);
+  }
 
-  // Then hydrate (also processes #access_token hash on OAuth callback).
-  supabase.auth.getSession().then(({ data }) => {
-    emit({ user: data.session?.user ?? null, session: data.session, loading: false });
-  });
+  try {
+    supabase.auth
+      .getSession()
+      .then(({ data, error }) => {
+        if (error) {
+          console.warn("[auth] getSession returned error, clearing stale storage", error);
+          clearStaleAuthStorage();
+          emit({ user: null, session: null, loading: false });
+          return;
+        }
+        emit({ user: data.session?.user ?? null, session: data.session, loading: false });
+      })
+      .catch((e) => {
+        console.error("[auth] getSession threw, clearing stale storage", e);
+        clearStaleAuthStorage();
+        emit({ user: null, session: null, loading: false });
+      });
+  } catch (e) {
+    console.error("[auth] getSession sync threw", e);
+    emit({ user: null, session: null, loading: false });
+  }
 }
 
 export function useAuth(): AuthState & {
@@ -42,7 +81,12 @@ export function useAuth(): AuthState & {
   const [state, setState] = useState<AuthState>(cached);
 
   useEffect(() => {
-    bootstrap();
+    try {
+      bootstrap();
+    } catch (e) {
+      console.error("[auth] bootstrap threw", e);
+      emit({ user: null, session: null, loading: false });
+    }
     listeners.add(setState);
     setState(cached);
     return () => {
@@ -53,19 +97,27 @@ export function useAuth(): AuthState & {
   return {
     ...state,
     signIn: async (email, password) => {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      return { error: error?.message };
+      try {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        return { error: error?.message };
+      } catch (e) {
+        return { error: e instanceof Error ? e.message : "Sign in failed" };
+      }
     },
     signUp: async (email, password, displayName) => {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
-          data: displayName ? { display_name: displayName } : undefined,
-        },
-      });
-      return { error: error?.message };
+      try {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
+            data: displayName ? { display_name: displayName } : undefined,
+          },
+        });
+        return { error: error?.message };
+      } catch (e) {
+        return { error: e instanceof Error ? e.message : "Sign up failed" };
+      }
     },
     signInWithGoogle: async () => {
       const callbackUrl = typeof window !== "undefined"
@@ -78,23 +130,30 @@ export function useAuth(): AuthState & {
           redirect_uri: callbackUrl,
         });
         if (!res.error) return {};
-        // Lovable auth returned an error — fall through to Supabase direct
       } catch {
-        // Lovable auth threw — fall through to Supabase direct
+        // fall through to Supabase direct
       }
 
-      // Fallback: use Supabase OAuth directly (PKCE flow — redirects to /auth-callback?code=...)
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: callbackUrl,
-        },
-      });
-      if (error) return { error: error.message };
-      return {}; // browser is redirecting
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: callbackUrl,
+          },
+        });
+        if (error) return { error: error.message };
+        return {};
+      } catch (e) {
+        return { error: e instanceof Error ? e.message : "Google sign in failed" };
+      }
     },
     signOut: async () => {
-      await supabase.auth.signOut();
+      try {
+        await supabase.auth.signOut();
+      } catch (e) {
+        console.error("[auth] signOut failed", e);
+        clearStaleAuthStorage();
+      }
     },
   };
 }

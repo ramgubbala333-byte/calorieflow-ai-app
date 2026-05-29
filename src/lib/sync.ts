@@ -242,10 +242,20 @@ export function startSync(h: Hydrators) {
     }
   };
 
-  supabase.auth.onAuthStateChange((_event, session) => {
-    hydrate(session?.user?.id ?? null);
-  });
-  supabase.auth.getSession().then(({ data }) => hydrate(data.session?.user?.id ?? null));
+  try {
+    supabase.auth.onAuthStateChange((_event, session) => {
+      hydrate(session?.user?.id ?? null);
+    });
+  } catch (e) {
+    console.error("[sync] onAuthStateChange subscribe failed", e);
+  }
+  try {
+    supabase.auth.getSession()
+      .then(({ data }) => hydrate(data.session?.user?.id ?? null))
+      .catch((e) => console.error("[sync] getSession failed", e));
+  } catch (e) {
+    console.error("[sync] getSession sync threw", e);
+  }
 }
 
 // ---------- helpers ----------

@@ -28,9 +28,9 @@ import { Route as HealthRouteImport } from './routes/health'
 import { Route as DiaryRouteImport } from './routes/diary'
 import { Route as CoachRouteImport } from './routes/coach'
 import { Route as BarcodeRouteImport } from './routes/barcode'
+import { Route as AuthCallbackRouteImport } from './routes/auth-callback'
 import { Route as AddFoodRouteImport } from './routes/add-food'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthCallbackRouteImport } from './routes/auth-callback'
 
 const WorkoutRoute = WorkoutRouteImport.update({
   id: '/workout',
@@ -127,6 +127,11 @@ const BarcodeRoute = BarcodeRouteImport.update({
   path: '/barcode',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth-callback',
+  path: '/auth-callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AddFoodRoute = AddFoodRouteImport.update({
   id: '/add-food',
   path: '/add-food',
@@ -137,15 +142,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/auth-callback',
-  path: '/auth-callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/add-food': typeof AddFoodRoute
+  '/auth-callback': typeof AuthCallbackRoute
   '/barcode': typeof BarcodeRoute
   '/coach': typeof CoachRoute
   '/diary': typeof DiaryRoute
@@ -165,11 +166,11 @@ export interface FileRoutesByFullPath {
   '/today': typeof TodayRoute
   '/voice': typeof VoiceRoute
   '/workout': typeof WorkoutRoute
-  '/auth-callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/add-food': typeof AddFoodRoute
+  '/auth-callback': typeof AuthCallbackRoute
   '/barcode': typeof BarcodeRoute
   '/coach': typeof CoachRoute
   '/diary': typeof DiaryRoute
@@ -189,12 +190,12 @@ export interface FileRoutesByTo {
   '/today': typeof TodayRoute
   '/voice': typeof VoiceRoute
   '/workout': typeof WorkoutRoute
-  '/auth-callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/add-food': typeof AddFoodRoute
+  '/auth-callback': typeof AuthCallbackRoute
   '/barcode': typeof BarcodeRoute
   '/coach': typeof CoachRoute
   '/diary': typeof DiaryRoute
@@ -214,13 +215,13 @@ export interface FileRoutesById {
   '/today': typeof TodayRoute
   '/voice': typeof VoiceRoute
   '/workout': typeof WorkoutRoute
-  '/auth-callback': typeof AuthCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/add-food'
+    | '/auth-callback'
     | '/barcode'
     | '/coach'
     | '/diary'
@@ -240,11 +241,11 @@ export interface FileRouteTypes {
     | '/today'
     | '/voice'
     | '/workout'
-    | '/auth-callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/add-food'
+    | '/auth-callback'
     | '/barcode'
     | '/coach'
     | '/diary'
@@ -264,11 +265,11 @@ export interface FileRouteTypes {
     | '/today'
     | '/voice'
     | '/workout'
-    | '/auth-callback'
   id:
     | '__root__'
     | '/'
     | '/add-food'
+    | '/auth-callback'
     | '/barcode'
     | '/coach'
     | '/diary'
@@ -288,12 +289,12 @@ export interface FileRouteTypes {
     | '/today'
     | '/voice'
     | '/workout'
-    | '/auth-callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AddFoodRoute: typeof AddFoodRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   BarcodeRoute: typeof BarcodeRoute
   CoachRoute: typeof CoachRoute
   DiaryRoute: typeof DiaryRoute
@@ -313,7 +314,6 @@ export interface RootRouteChildren {
   TodayRoute: typeof TodayRoute
   VoiceRoute: typeof VoiceRoute
   WorkoutRoute: typeof WorkoutRoute
-  AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -451,6 +451,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BarcodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth-callback': {
+      id: '/auth-callback'
+      path: '/auth-callback'
+      fullPath: '/auth-callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/add-food': {
       id: '/add-food'
       path: '/add-food'
@@ -465,19 +472,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth-callback': {
-      id: '/auth-callback'
-      path: '/auth-callback'
-      fullPath: '/auth-callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AddFoodRoute: AddFoodRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   BarcodeRoute: BarcodeRoute,
   CoachRoute: CoachRoute,
   DiaryRoute: DiaryRoute,
@@ -497,8 +498,17 @@ const rootRouteChildren: RootRouteChildren = {
   TodayRoute: TodayRoute,
   VoiceRoute: VoiceRoute,
   WorkoutRoute: WorkoutRoute,
-  AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
