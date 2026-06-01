@@ -265,7 +265,13 @@ export function useAuth(): AuthState & {
         await supabase.auth.signOut();
       } catch (e) {
         console.error("[auth] signOut failed", e);
-        clearStaleAuthStorage();
+      }
+      // Force-clear state and storage regardless of network result so the UI
+      // reflects the sign-out even if onAuthStateChange didn't fire.
+      clearStaleAuthStorage();
+      emit({ user: null, session: null, loading: false });
+      if (typeof window !== "undefined") {
+        window.location.replace("/");
       }
     },
   };
