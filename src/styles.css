@@ -104,6 +104,7 @@
    LIGHT THEME — Google Health app vibe (clean, airy)
    ========================================================= */
 .light {
+  color-scheme: light;
   --background: oklch(0.985 0.005 240);
   --foreground: oklch(0.18 0.02 250);
 
