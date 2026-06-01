@@ -1,7 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { Sparkles, Camera, Mic, Barcode, Dumbbell, ShieldCheck, ChevronRight } from "lucide-react";
+import {
+  Sparkles, Camera, Mic, Barcode, Dumbbell, ShieldCheck, ChevronRight,
+  Flame, Apple, Drumstick, Wheat, Droplet, Heart, Activity, Salad,
+  Cookie, Egg, Fish, Coffee, Pizza, Beef, Carrot, Star, Zap, Trophy,
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,134 +27,258 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
+const FOOD_TICKER = [
+  { e: "🥑", t: "Avocado · 240 kcal" },
+  { e: "🍳", t: "Eggs (2) · 156 kcal" },
+  { e: "🥗", t: "Caesar salad · 320 kcal" },
+  { e: "🍗", t: "Grilled chicken · 284 kcal" },
+  { e: "🍌", t: "Banana · 105 kcal" },
+  { e: "🥪", t: "Turkey sandwich · 380 kcal" },
+  { e: "🍣", t: "Salmon nigiri · 220 kcal" },
+  { e: "☕", t: "Oat latte · 120 kcal" },
+  { e: "🥣", t: "Greek yogurt · 150 kcal" },
+  { e: "🍕", t: "Pepperoni slice · 298 kcal" },
+];
+
+const STATS_TICKER = [
+  { i: Flame, t: "1.2M meals logged this week" },
+  { i: Activity, t: "98% scan accuracy" },
+  { i: Heart, t: "4.9 ★ App Store" },
+  { i: Zap, t: "Logs in under 2 seconds" },
+  { i: Trophy, t: "#1 trending health app" },
+  { i: ShieldCheck, t: "Zero data sold. Ever." },
+];
+
 function Landing() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect authenticated users (e.g. after Google OAuth callback lands on root)
   useEffect(() => {
     if (!loading && user) navigate({ to: "/today" });
   }, [user, loading, navigate]);
 
   return (
-    <div className="mx-auto max-w-md min-h-screen relative">
-      {/* nav */}
-      <header className="px-5 pt-[max(env(safe-area-inset-top),1rem)] flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="w-9 h-9 rounded-xl gradient-primary grid place-items-center text-primary-foreground font-bold text-xs glow">CF</span>
-          <span className="font-display font-semibold tracking-tight">CalorieFlow</span>
+    <div className="mx-auto max-w-md min-h-screen relative overflow-x-hidden">
+      {/* ambient blobs for glass depth */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-[-15%] left-[-20%] w-[60vw] h-[60vw] rounded-full bg-[var(--glow)] opacity-30 blur-3xl animate-blob-1" />
+        <div className="absolute top-[20%] right-[-25%] w-[55vw] h-[55vw] rounded-full bg-[var(--glow-2)] opacity-25 blur-3xl animate-blob-2" />
+        <div className="absolute bottom-[-10%] left-[10%] w-[60vw] h-[60vw] rounded-full bg-[var(--glow-3)] opacity-20 blur-3xl animate-blob-3" />
+      </div>
+
+      {/* macOS-style top bar */}
+      <header className="sticky top-0 z-40 px-3 pt-[max(env(safe-area-inset-top),0.5rem)] pb-2">
+        <div className="glass-mac flex items-center justify-between px-3 h-11 rounded-2xl">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 pl-0.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
+            </div>
+            <span className="ml-2 font-display font-semibold tracking-tight text-sm">CalorieFlow</span>
+          </div>
+          <Link
+            to="/login"
+            className="glass-chip h-7 px-3 rounded-full text-[11px] font-medium grid place-items-center"
+          >
+            Sign in
+          </Link>
         </div>
-        <Link
-          to="/login"
-          className="text-xs font-medium text-muted-foreground hover:text-foreground"
-        >
-          Sign in
-        </Link>
       </header>
 
-      {/* hero */}
-      <section className="px-5 pt-10 pb-8 animate-fade-up">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs text-muted-foreground mb-5">
+      {/* Hero */}
+      <section className="px-4 pt-6 pb-5 animate-fade-up">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-chip text-[11px] text-muted-foreground mb-5">
           <Sparkles className="w-3.5 h-3.5 text-primary" />
-          AI-powered • Privacy first
+          AI-powered · Privacy first · v2.6
         </div>
-        <h1 className="text-[2.75rem] leading-[1.02] font-display font-bold tracking-tight uppercase">
-          We build <br />
-          <span className="gradient-text-aurora">AI-driven</span> <br />
-          calorie tracking <br />
-          people <span className="italic font-display font-medium normal-case text-muted-foreground">care about.</span>
+        <h1 className="text-[2.5rem] leading-[1.04] font-display font-bold tracking-tight">
+          Calorie tracking
+          <br />
+          that feels like
+          <br />
+          <span className="gradient-text-aurora">a deep breath.</span>
         </h1>
-
-        <p className="mt-4 text-[15px] text-muted-foreground leading-relaxed">
-          Snap a photo, say what you ate, or scan a barcode.
-          CalorieFlow AI logs everything in seconds — and nudges you to the gym.
+        <p className="mt-4 text-[14px] text-muted-foreground leading-relaxed">
+          Snap a photo, say what you ate, or scan a barcode. CalorieFlow logs everything in seconds.
         </p>
 
-        <div className="mt-7 flex flex-col gap-3">
+        <div className="mt-6 flex flex-col gap-2.5">
           <Link
             to="/onboarding"
-            className="h-14 rounded-2xl gradient-primary text-primary-foreground font-semibold grid place-items-center glow-strong"
+            className="h-13 py-3.5 rounded-2xl gradient-primary text-primary-foreground font-semibold grid place-items-center glow-strong"
           >
-            Start free — 1 minute setup
+            Start free — 1 min setup
           </Link>
           <Link
             to="/login"
-            className="h-12 rounded-2xl glass font-medium grid place-items-center text-foreground"
+            className="h-12 rounded-2xl glass-mac font-medium grid place-items-center text-foreground"
           >
             Sign in to explore
           </Link>
         </div>
+      </section>
 
-        <div className="mt-6 flex items-center gap-2 text-[11px] text-muted-foreground">
-          <ShieldCheck className="w-4 h-4 text-accent" />
-          No ads. No selling data. Delete anytime.
+      {/* Scrolling food ticker */}
+      <section className="pb-4">
+        <div className="marquee-mask overflow-hidden">
+          <div className="flex gap-2 w-max animate-marquee">
+            {[...FOOD_TICKER, ...FOOD_TICKER].map((f, i) => (
+              <div
+                key={i}
+                className="glass-chip h-10 px-3.5 rounded-full flex items-center gap-2 text-xs whitespace-nowrap"
+              >
+                <span className="text-base leading-none">{f.e}</span>
+                <span className="font-medium text-foreground/85">{f.t}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* feature mock */}
-      <section className="px-5 pb-10">
-        <div className="relative animate-float">
-          <div className="absolute -inset-6 gradient-primary opacity-25 blur-3xl rounded-full" />
-          <div className="relative glass-strong rounded-3xl p-5">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Today</span>
-              <span className="tabular-nums">Sun, May 24</span>
+      {/* App preview window — macOS chrome */}
+      <section className="px-4 pb-8">
+        <div className="relative">
+          <div className="absolute -inset-8 gradient-primary opacity-20 blur-3xl rounded-full" />
+          <div className="relative glass-mac p-0 overflow-hidden">
+            {/* window chrome */}
+            <div className="flex items-center gap-2 px-4 h-9 border-b border-white/10">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
+              <span className="mx-auto text-[10px] font-medium text-muted-foreground tabular-nums">
+                Today · Sun, May 24
+              </span>
             </div>
-            <div className="mt-3 flex items-end justify-between">
-              <div>
-                <div className="text-5xl font-bold gradient-text font-display">330</div>
-                <div className="text-xs text-muted-foreground mt-1">kcal remaining</div>
-              </div>
-              <div className="text-right text-xs text-muted-foreground">
-                <div>1,870 <span className="opacity-60">/ 2,200</span></div>
-                <div className="text-accent mt-1">P 142g · C 168g · F 62g</div>
-              </div>
-            </div>
-            <div className="mt-4 h-2 rounded-full bg-white/5 overflow-hidden">
-              <div className="h-full gradient-primary rounded-full" style={{ width: "85%" }} />
-            </div>
-            <div className="mt-5 grid grid-cols-4 gap-2 text-[11px]">
-              {[
-                { i: Camera, l: "Scan" },
-                { i: Mic, l: "Voice" },
-                { i: Barcode, l: "Barcode" },
-                { i: Dumbbell, l: "Gym" },
-              ].map(({ i: I, l }) => (
-                <div key={l} className="glass rounded-xl py-3 grid place-items-center gap-1">
-                  <I className="w-4 h-4 text-primary" />
-                  <span>{l}</span>
+
+            <div className="p-5">
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className="text-5xl font-bold gradient-text font-display tabular-nums leading-none">330</div>
+                  <div className="text-[11px] text-muted-foreground mt-1.5">kcal remaining</div>
                 </div>
-              ))}
+                <div className="text-right text-[11px] text-muted-foreground space-y-0.5">
+                  <div className="tabular-nums">1,870 <span className="opacity-60">/ 2,200</span></div>
+                  <div className="flex gap-2 justify-end mt-1">
+                    <span className="flex items-center gap-0.5"><Drumstick className="w-3 h-3" /> 142g</span>
+                    <span className="flex items-center gap-0.5"><Wheat className="w-3 h-3" /> 168g</span>
+                    <span className="flex items-center gap-0.5"><Droplet className="w-3 h-3" /> 62g</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 h-2 rounded-full bg-foreground/10 overflow-hidden">
+                <div className="h-full gradient-primary rounded-full" style={{ width: "85%" }} />
+              </div>
+
+              <div className="mt-5 grid grid-cols-4 gap-2 text-[10px]">
+                {[
+                  { i: Camera, l: "Scan" },
+                  { i: Mic, l: "Voice" },
+                  { i: Barcode, l: "Barcode" },
+                  { i: Dumbbell, l: "Gym" },
+                ].map(({ i: I, l }) => (
+                  <div key={l} className="glass-chip rounded-xl py-2.5 grid place-items-center gap-1">
+                    <I className="w-4 h-4 text-primary" />
+                    <span className="font-medium">{l}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mac-divider my-4" />
+
+              <div className="space-y-1.5">
+                {[
+                  { e: "🥗", n: "Caesar salad", k: "320 kcal", t: "12:42 PM" },
+                  { e: "🍗", n: "Grilled chicken", k: "284 kcal", t: "1:08 PM" },
+                  { e: "☕", n: "Oat latte", k: "120 kcal", t: "3:20 PM" },
+                ].map((m) => (
+                  <div key={m.n} className="flex items-center gap-3 py-1.5">
+                    <div className="w-9 h-9 rounded-xl glass-chip grid place-items-center text-base">{m.e}</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold truncate">{m.n}</p>
+                      <p className="text-[10px] text-muted-foreground">{m.t}</p>
+                    </div>
+                    <span className="text-[11px] font-semibold tabular-nums">{m.k}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* features */}
-      <section className="px-5 pb-10 space-y-3">
-        {[
-          { i: Camera, t: "AI Food Scan", d: "Snap your plate. We estimate calories and macros in 2 seconds." },
-          { i: Mic, t: "Voice Logging", d: "Say 'two scrambled eggs and toast' — done." },
-          { i: Dumbbell, t: "Smart Gym Reminders", d: "Personal nudges that respect your schedule, not spam." },
-          { i: ShieldCheck, t: "Privacy You Control", d: "Local-first by default. One-tap data deletion." },
-        ].map(({ i: I, t, d }) => (
-          <div key={t} className="glass rounded-2xl p-4 flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl gradient-primary/20 grid place-items-center text-primary shrink-0">
-              <I className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm">{t}</h3>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{d}</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground mt-2" />
+      {/* Stats ticker — reverse direction */}
+      <section className="pb-8">
+        <div className="marquee-mask overflow-hidden">
+          <div className="flex gap-2 w-max animate-marquee-reverse">
+            {[...STATS_TICKER, ...STATS_TICKER].map(({ i: I, t }, i) => (
+              <div
+                key={i}
+                className="glass-chip h-10 px-3.5 rounded-full flex items-center gap-2 text-xs whitespace-nowrap"
+              >
+                <I className="w-3.5 h-3.5 text-primary" />
+                <span className="font-medium">{t}</span>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </section>
 
-      <section className="px-5 pb-12">
-        <div className="glass-strong rounded-3xl p-6 text-center">
-          <p className="text-xs text-muted-foreground">Pro plan</p>
-          <h3 className="font-display text-2xl font-semibold mt-1">Unlimited AI scans</h3>
+      {/* Features — macOS list */}
+      <section className="px-4 pb-8">
+        <div className="glass-mac divide-y divide-white/10 dark:divide-white/10 overflow-hidden">
+          {[
+            { i: Camera, t: "AI Food Scan", d: "Snap your plate. Calories & macros in 2s.", color: "var(--glow)" },
+            { i: Mic, t: "Voice Logging", d: "'Two eggs and toast' — done.", color: "var(--glow-2)" },
+            { i: Dumbbell, t: "Smart Gym Reminders", d: "Nudges that respect your schedule.", color: "var(--glow-3)" },
+            { i: ShieldCheck, t: "Privacy You Control", d: "Local-first. One-tap deletion.", color: "var(--glow-4)" },
+          ].map(({ i: I, t, d, color }) => (
+            <div key={t} className="flex items-center gap-3 p-4 hover:bg-foreground/5 transition-colors">
+              <div
+                className="w-10 h-10 rounded-xl grid place-items-center shrink-0"
+                style={{ background: `color-mix(in oklch, ${color} 22%, transparent)`, color }}
+              >
+                <I className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-sm">{t}</h3>
+                <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{d}</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Emoji food rail */}
+      <section className="pb-8">
+        <div className="marquee-mask overflow-hidden">
+          <div className="flex gap-3 w-max animate-marquee-slow">
+            {[...Array(2)].flatMap((_, k) =>
+              ["🥑","🍳","🥗","🍗","🍌","🥪","🍣","☕","🥣","🍕","🍎","🥥","🧀","🥕","🍇","🍓","🌮","🍜"].map((e, i) => (
+                <div
+                  key={`${k}-${i}`}
+                  className="glass-chip w-12 h-12 rounded-2xl grid place-items-center text-2xl shrink-0"
+                >
+                  {e}
+                </div>
+              )),
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Pro card */}
+      <section className="px-4 pb-10">
+        <div className="glass-mac p-6 text-center relative overflow-hidden">
+          <div className="absolute inset-0 -z-10 opacity-40">
+            <div className="absolute inset-0 gradient-primary blur-2xl" />
+          </div>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full glass-chip text-[10px] font-semibold uppercase tracking-wider mb-2">
+            <Star className="w-3 h-3 text-[var(--glow-4)] fill-[var(--glow-4)]" /> Pro
+          </div>
+          <h3 className="font-display text-2xl font-semibold">Unlimited AI scans</h3>
           <p className="text-xs text-muted-foreground mt-1">$4.99/mo · cancel anytime</p>
           <Link
             to="/subscription"
