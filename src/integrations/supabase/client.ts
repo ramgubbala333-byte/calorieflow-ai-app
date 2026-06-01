@@ -25,6 +25,11 @@ function createSupabaseClient() {
       storage: typeof window !== 'undefined' ? localStorage : undefined,
       persistSession: true,
       autoRefreshToken: true,
+      flowType: 'pkce',
+      // We complete the OAuth/email PKCE code exchange explicitly in
+      // src/hooks/use-auth.ts so we get deterministic success/error handling
+      // instead of racing supabase-js's automatic URL detection.
+      detectSessionInUrl: false,
     }
   });
 }

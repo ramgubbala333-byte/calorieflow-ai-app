@@ -62,6 +62,7 @@ function clearStaleAuthStorage() {
  * back. We parse them here so the redirect flow can finish signing in.
  */
 type UrlOAuthResult =
+  | { kind: "code"; code: string }
   | { kind: "tokens"; access_token: string; refresh_token: string }
   | { kind: "error"; message: string }
   | null;
@@ -76,6 +77,12 @@ function readOAuthFromUrl(): UrlOAuthResult {
     const errorDescription = pick("error_description") ?? pick("error");
     if (errorDescription) return { kind: "error", message: decodeURIComponent(errorDescription) };
 
+    // Native Supabase OAuth and email confirmation links use the PKCE flow,
+    // returning an auth code that we exchange for a session.
+    const code = queryParams.get("code");
+    if (code) return { kind: "code", code };
+
+    // Defensive: some flows hand back tokens directly in the URL hash.
     const access_token = pick("access_token");
     const refresh_token = pick("refresh_token");
     if (access_token && refresh_token) return { kind: "tokens", access_token, refresh_token };
@@ -135,6 +142,39 @@ function bootstrap() {
       /* toaster not mounted */
     }
     emit({ user: null, session: null, loading: false });
+    return;
+  }
+
+  // Came back from native Supabase OAuth (or an email link) with a PKCE code —
+  // exchange it for a session.
+  if (urlOAuth?.kind === "code") {
+    supabase.auth
+      .exchangeCodeForSession(urlOAuth.code)
+      .then(({ data, error }) => {
+        cleanOAuthFromUrl();
+        if (error) {
+          console.error("[auth] exchangeCodeForSession failed", error);
+          try {
+            toast.error("Couldn't complete sign-in. Please try again.");
+          } catch {
+            /* toaster not mounted */
+          }
+          emit({ user: null, session: null, loading: false });
+          return;
+        }
+        captureIdentity(data.session?.user ?? null);
+        emit({ user: data.session?.user ?? null, session: data.session, loading: false });
+      })
+      .catch((e) => {
+        cleanOAuthFromUrl();
+        console.error("[auth] exchangeCodeForSession threw", e);
+        try {
+          toast.error("Couldn't complete sign-in. Please try again.");
+        } catch {
+          /* toaster not mounted */
+        }
+        emit({ user: null, session: null, loading: false });
+      });
     return;
   }
 
@@ -245,15 +285,20 @@ export function useAuth(): AuthState & {
     },
     signInWithGoogle: async () => {
       try {
-        const { lovable } = await import("@/integrations/lovable/index");
-        const result = await lovable.auth.signInWithOAuth("google", {
-          redirect_uri: typeof window !== "undefined" ? window.location.origin : undefined,
+        const redirectTo =
+          typeof window !== "undefined" ? `${window.location.origin}/auth-callback` : undefined;
+        // Native Supabase Google OAuth: the token is minted AND verified by the
+        // same project, so it passes JWT verification (unlike the cross-issuer
+        // Cloud broker tokens). supabase-js redirects the browser to Google.
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo,
+            queryParams: { prompt: "select_account" },
+          },
         });
-        if (result.error) {
-          const msg = result.error instanceof Error ? result.error.message : String(result.error);
-          return { error: msg };
-        }
-        // Either redirected to Google or tokens received & session set.
+        if (error) return { error: error.message };
+        // Browser redirects to Google — component unmounts.
         return {};
       } catch (e) {
         return { error: e instanceof Error ? e.message : "Google sign in failed" };

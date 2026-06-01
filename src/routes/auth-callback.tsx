@@ -18,6 +18,16 @@ function AuthCallback() {
     }
   }, [user, loading, navigate]);
 
+  // Safety net: never leave the user stuck on the spinner if the code exchange
+  // stalls (e.g. network hiccup). The auth bootstrap surfaces its own toast on
+  // failure; this just gets them back to a usable screen.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (!user) navigate({ to: "/login" });
+    }, 10000);
+    return () => clearTimeout(t);
+  }, [user, navigate]);
+
   return (
     <div className="min-h-screen grid place-items-center bg-background">
       <div className="text-center">
