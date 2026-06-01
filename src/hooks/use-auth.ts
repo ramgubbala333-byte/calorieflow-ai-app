@@ -119,25 +119,22 @@ export function useAuth(): AuthState & {
       }
     },
     signInWithGoogle: async () => {
-      const callbackUrl = typeof window !== "undefined"
-        ? window.location.origin + "/auth-callback"
-        : undefined;
-
-      // Supabase direct OAuth — uses your Supabase project's Google OAuth
-      // config and triggers a full-page redirect to Google.
       try {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: "google",
-          options: {
-            redirectTo: callbackUrl,
-          },
+        const { lovable } = await import("@/integrations/lovable/index");
+        const result = await lovable.auth.signInWithOAuth("google", {
+          redirect_uri: typeof window !== "undefined" ? window.location.origin : undefined,
         });
-        if (error) return { error: error.message };
+        if (result.error) {
+          const msg = result.error instanceof Error ? result.error.message : String(result.error);
+          return { error: msg };
+        }
+        // Either redirected to Google or tokens received & session set.
         return {};
       } catch (e) {
         return { error: e instanceof Error ? e.message : "Google sign in failed" };
       }
     },
+
     signOut: async () => {
       try {
         await supabase.auth.signOut();
