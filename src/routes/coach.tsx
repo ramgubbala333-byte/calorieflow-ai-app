@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { coachMessages } from "@/lib/mock-data";
-import { Send, Sparkles, MoreHorizontal } from "lucide-react";
-import { useState } from "react";
+import { Send, Sparkles, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { chatWithCoach, type CoachChatMessage } from "@/lib/api";
+import { useAuth } from "@/hooks/use-auth";
+import { getProfile, getGoals, getMeals, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/coach")({
   head: () => ({ meta: [{ title: "AI Coach · CalorieFlow AI" }] }),
@@ -12,26 +14,85 @@ export const Route = createFileRoute("/coach")({
 const quickReplies = [
   "Plan today's meals",
   "Why am I plateauing?",
-  "Pre-workout snack idea",
-  "Hit 165g protein",
+  "High-protein Indian snack",
+  "Hit my protein goal",
 ];
 
-function Coach() {
-  const [msgs, setMsgs] = useState(coachMessages);
-  const [text, setText] = useState("");
+type ChatTurn = { role: "user" | "assistant"; text: string };
 
-  const send = (t: string) => {
-    if (!t.trim()) return;
-    setMsgs((m) => [
-      ...m,
-      { role: "user", text: t },
-      {
-        role: "coach",
-        text:
-          "Got it. Based on your last 7 days, I'd add a Greek yogurt snack at 3pm and shift dinner protein to 45g.",
+const GREETING: ChatTurn = {
+  role: "assistant",
+  text: "Hey! I'm your CalorieFlow coach. Ask me about meals, macros, or your progress — I can see your goals and today's log. What would you like help with?",
+};
+
+function Coach() {
+  const { user } = useAuth();
+  const profile = useStore(() => getProfile());
+  const goals = useStore(() => getGoals());
+  const meals = useStore(() => getMeals());
+
+  const [msgs, setMsgs] = useState<ChatTurn[]>([GREETING]);
+  const [text, setText] = useState("");
+  const [sending, setSending] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [msgs, sending]);
+
+  const buildContext = () => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayMeals = meals
+      .filter((m) => m.loggedDate === todayStr || !m.loggedDate)
+      .map((m) => ({
+        name: m.name,
+        calories: m.calories,
+        protein: m.protein,
+        carbs: m.carbs,
+        fat: m.fat,
+      }));
+    return {
+      profile: {
+        name: profile.name,
+        weightKg: profile.weightKg,
+        heightCm: profile.heightCm,
+        age: profile.age,
+        activity: profile.activity,
+        foodPreference: profile.foodPreference,
       },
-    ]);
+      goals,
+      todayMeals,
+    };
+  };
+
+  const send = async (t: string) => {
+    const message = t.trim();
+    if (!message || sending) return;
     setText("");
+
+    const history: CoachChatMessage[] = msgs
+      .filter((m) => m !== GREETING)
+      .map((m) => ({ role: m.role, content: m.text }));
+
+    setMsgs((m) => [...m, { role: "user", text: message }]);
+    setSending(true);
+    try {
+      const { reply } = await chatWithCoach({
+        message,
+        history,
+        coachCtx: buildContext(),
+        userId: user?.id,
+      });
+      setMsgs((m) => [...m, { role: "assistant", text: reply }]);
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "The coach is unavailable right now. Please try again.";
+      setMsgs((m) => [...m, { role: "assistant", text: msg }]);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -46,16 +107,13 @@ function Coach() {
             <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" /> Online · private
           </p>
         </div>
-        <button className="w-9 h-9 rounded-full glass grid place-items-center">
-          <MoreHorizontal className="w-4 h-4" />
-        </button>
       </header>
 
-      <div className="px-4 py-5 space-y-3">
+      <div ref={scrollRef} className="px-4 py-5 space-y-3 overflow-y-auto">
         {msgs.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
-              className={`max-w-[78%] px-4 py-3 text-sm leading-relaxed rounded-2xl ${
+              className={`max-w-[78%] px-4 py-3 text-sm leading-relaxed rounded-2xl whitespace-pre-wrap ${
                 m.role === "user"
                   ? "gradient-primary text-primary-foreground rounded-br-md"
                   : "glass rounded-bl-md"
@@ -66,22 +124,13 @@ function Coach() {
           </div>
         ))}
 
-        {/* suggestion card from coach */}
-        <div className="glass-strong rounded-2xl p-4 mt-2">
-          <p className="text-[11px] text-primary font-semibold mb-2 flex items-center gap-1.5">
-            <Sparkles className="w-3 h-3" /> Suggested meal
-          </p>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl glass grid place-items-center text-2xl">🍣</div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold">Salmon, jasmine rice, bok choy</p>
-              <p className="text-[11px] text-muted-foreground">640 kcal · 42g protein · 10 min</p>
+        {sending && (
+          <div className="flex justify-start">
+            <div className="glass rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="w-4 h-4 animate-spin" /> Thinking…
             </div>
-            <button className="text-xs font-semibold px-3 py-1.5 rounded-full gradient-primary text-primary-foreground glow">
-              Log
-            </button>
           </div>
-        </div>
+        )}
       </div>
 
       {/* quick replies */}
@@ -90,7 +139,8 @@ function Coach() {
           <button
             key={q}
             onClick={() => send(q)}
-            className="shrink-0 glass rounded-full px-3 h-8 text-xs text-foreground/90"
+            disabled={sending}
+            className="shrink-0 glass rounded-full px-3 h-8 text-xs text-foreground/90 disabled:opacity-50"
           >
             {q}
           </button>
@@ -105,14 +155,16 @@ function Coach() {
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send(text)}
             placeholder="Ask your coach…"
-            className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none placeholder:text-muted-foreground"
+            disabled={sending}
+            className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none placeholder:text-muted-foreground disabled:opacity-60"
           />
           <button
             onClick={() => send(text)}
+            disabled={sending || !text.trim()}
             aria-label="Send"
-            className="w-10 h-10 rounded-xl gradient-primary grid place-items-center text-primary-foreground glow"
+            className="w-10 h-10 rounded-xl gradient-primary grid place-items-center text-primary-foreground glow disabled:opacity-50"
           >
-            <Send className="w-4 h-4" />
+            {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>
         </div>
       </div>

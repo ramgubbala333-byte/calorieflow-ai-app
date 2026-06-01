@@ -1,12 +1,32 @@
 import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { mergeIdentity } from "@/lib/store";
 
 export type AuthState = {
   user: User | null;
   session: Session | null;
   loading: boolean;
 };
+
+/**
+ * Pull display name / email / avatar out of the Supabase user object. Google,
+ * email-password, and other providers store these under different metadata
+ * keys, so we check all the common ones.
+ */
+function captureIdentity(user: User | null) {
+  if (!user) return;
+  const m = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const name =
+    (m.full_name as string) ?? (m.name as string) ?? (m.display_name as string) ?? undefined;
+  const avatarUrl = (m.avatar_url as string) ?? (m.picture as string) ?? undefined;
+  const email = user.email ?? (m.email as string) ?? undefined;
+  try {
+    mergeIdentity({ name, email, avatarUrl });
+  } catch {
+    /* localStorage unavailable */
+  }
+}
 
 let cached: AuthState = { user: null, session: null, loading: true };
 const listeners = new Set<(s: AuthState) => void>();
@@ -38,6 +58,7 @@ function bootstrap() {
   try {
     supabase.auth.onAuthStateChange((_event, session) => {
       try {
+        captureIdentity(session?.user ?? null);
         emit({ user: session?.user ?? null, session, loading: false });
       } catch (e) {
         console.error("[auth] onAuthStateChange emit failed", e);
@@ -58,6 +79,7 @@ function bootstrap() {
           emit({ user: null, session: null, loading: false });
           return;
         }
+        captureIdentity(data.session?.user ?? null);
         emit({ user: data.session?.user ?? null, session: data.session, loading: false });
       })
       .catch((e) => {

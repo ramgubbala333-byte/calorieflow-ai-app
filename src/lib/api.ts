@@ -51,9 +51,11 @@ function mapOFF(p: OFFProduct): SearchFood {
     barcode: p.code,
     serving: p.serving_size?.trim() || (useServing ? "1 serving" : "100 g"),
     kcal: Math.round(useServing ? n["energy-kcal_serving"]! : (n["energy-kcal_100g"] ?? 0)),
-    p: Number((useServing ? n.proteins_serving ?? 0 : n.proteins_100g ?? 0).toFixed(1)),
-    c: Number((useServing ? n.carbohydrates_serving ?? 0 : n.carbohydrates_100g ?? 0).toFixed(1)),
-    f: Number((useServing ? n.fat_serving ?? 0 : n.fat_100g ?? 0).toFixed(1)),
+    p: Number((useServing ? (n.proteins_serving ?? 0) : (n.proteins_100g ?? 0)).toFixed(1)),
+    c: Number(
+      (useServing ? (n.carbohydrates_serving ?? 0) : (n.carbohydrates_100g ?? 0)).toFixed(1),
+    ),
+    f: Number((useServing ? (n.fat_serving ?? 0) : (n.fat_100g ?? 0)).toFixed(1)),
   };
 }
 
@@ -65,7 +67,9 @@ export async function searchFoods(q: string): Promise<SearchFood[]> {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`OFF search ${res.status}`);
     const data = (await res.json()) as { products?: OFFProduct[] };
-    return (data.products ?? []).filter((p) => p.product_name && p.nutriments?.["energy-kcal_100g"]).map(mapOFF);
+    return (data.products ?? [])
+      .filter((p) => p.product_name && p.nutriments?.["energy-kcal_100g"])
+      .map(mapOFF);
   } catch (e) {
     console.error("[api.searchFoods]", e);
     throw new Error("Search failed. Check your connection and try again.");
@@ -87,14 +91,65 @@ export async function lookupBarcode(code: string): Promise<SearchFood> {
 
 // ---------- AI (calls server functions; see src/lib/ai.functions.ts) ----------
 
-import { analyzeFoodImage as _analyzeFoodImage, transcribeVoice as _transcribeVoice } from "./ai.functions";
+import {
+  analyzeFoodImage as _analyzeFoodImage,
+  transcribeVoice as _transcribeVoice,
+  chatWithCoach as _chatWithCoach,
+} from "./ai.functions";
 
-export async function analyzeFoodImage(imageDataUrl?: string): Promise<{ items: SearchFood[]; confidence: number }> {
+export async function analyzeFoodImage(
+  imageDataUrl?: string,
+): Promise<{ items: SearchFood[]; confidence: number }> {
   const data = await _analyzeFoodImage({ data: { imageDataUrl: imageDataUrl ?? "" } });
   return { items: data.items, confidence: data.confidence };
 }
 
-export async function transcribeVoice(opts?: { audioBase64?: string; transcript?: string }): Promise<{ transcript: string; items: SearchFood[] }> {
-  const data = await _transcribeVoice({ data: { audioBase64: opts?.audioBase64 ?? "", transcript: opts?.transcript } });
+export async function transcribeVoice(opts?: {
+  audioBase64?: string;
+  transcript?: string;
+}): Promise<{ transcript: string; items: SearchFood[] }> {
+  const data = await _transcribeVoice({
+    data: { audioBase64: opts?.audioBase64 ?? "", transcript: opts?.transcript },
+  });
   return { transcript: data.transcript, items: data.items };
+}
+
+export type CoachChatMessage = { role: "user" | "assistant"; content: string };
+
+export type CoachContext = {
+  profile?: {
+    name?: string;
+    weightKg?: number;
+    heightCm?: number;
+    age?: number;
+    activity?: string;
+    goalType?: string;
+    foodPreference?: string;
+  };
+  goals?: { calories: number; protein: number; carbs: number; fat: number };
+  todayMeals?: Array<{
+    name: string;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  }>;
+  recentWeight?: number;
+};
+
+export async function chatWithCoach(opts: {
+  message: string;
+  history?: CoachChatMessage[];
+  coachCtx?: CoachContext;
+  userId?: string;
+}): Promise<{ reply: string }> {
+  const data = await _chatWithCoach({
+    data: {
+      message: opts.message,
+      history: opts.history,
+      coachCtx: opts.coachCtx,
+      userId: opts.userId,
+    },
+  });
+  return { reply: data.reply };
 }

@@ -15,14 +15,17 @@ export const Route = createFileRoute("/voice")({
 const bars = Array.from({ length: 28 });
 
 // Check for Web Speech API support
-const hasSpeechAPI = typeof window !== "undefined" &&
+const hasSpeechAPI =
+  typeof window !== "undefined" &&
   ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
 
 type SpeechRecognitionType = typeof window extends { SpeechRecognition: infer T } ? T : never;
 
 function Voice() {
   const nav = useNavigate();
-  const [phase, setPhase] = useState<"idle" | "listening" | "processing" | "ready" | "error">("idle");
+  const [phase, setPhase] = useState<"idle" | "listening" | "processing" | "ready" | "error">(
+    "idle",
+  );
   const [transcript, setTranscript] = useState("");
   const [items, setItems] = useState<SearchFood[]>([]);
   const [textMode, setTextMode] = useState(!hasSpeechAPI);
@@ -42,10 +45,16 @@ function Voice() {
       const r = await transcribeVoice({ transcript: text });
       setTranscript(r.transcript || text);
       setItems(r.items);
+      if (!r.items.length) {
+        setPhase("error");
+        toast.error("No food found in that. Try naming the dishes and portions.");
+        return;
+      }
       setPhase("ready");
-    } catch {
+    } catch (err: unknown) {
       setPhase("error");
-      toast.error("Couldn't parse that. Try again.");
+      const msg = err instanceof Error ? err.message : "Couldn't parse that. Try again.";
+      toast.error(msg);
     }
   };
 
@@ -109,9 +118,22 @@ function Voice() {
   const total = items.reduce((a, i) => a + i.kcal, 0);
 
   const logAll = () => {
-    const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+    const time = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
     items.forEach((i) =>
-      addMeal({ name: i.name, type: "Breakfast", time, calories: i.kcal, protein: i.p, carbs: i.c, fat: i.f, emoji: "🍽️" }),
+      addMeal({
+        name: i.name,
+        type: "Breakfast",
+        time,
+        calories: i.kcal,
+        protein: i.p,
+        carbs: i.c,
+        fat: i.f,
+        emoji: "🍽️",
+      }),
     );
     toast.success("Voice log saved", { description: `${items.length} items added` });
     nav({ to: "/diary" });
@@ -124,11 +146,17 @@ function Voice() {
   };
 
   const status =
-    phase === "listening" ? "Listening… tap to stop" :
-    phase === "processing" ? "Analysing…" :
-    phase === "ready" ? "Done — review below" :
-    phase === "error" ? "Couldn't process that" :
-    textMode ? "Type what you ate" : "Tap the mic to start";
+    phase === "listening"
+      ? "Listening… tap to stop"
+      : phase === "processing"
+        ? "Analysing…"
+        : phase === "ready"
+          ? "Done — review below"
+          : phase === "error"
+            ? "Couldn't process that"
+            : textMode
+              ? "Type what you ate"
+              : "Tap the mic to start";
 
   return (
     <AppShell>
@@ -139,13 +167,19 @@ function Voice() {
         <div className="flex justify-center mb-6">
           <div className="glass rounded-full p-1 flex gap-1">
             <button
-              onClick={() => { setTextMode(false); reset(); }}
+              onClick={() => {
+                setTextMode(false);
+                reset();
+              }}
               className={`flex items-center gap-1.5 px-3 h-8 rounded-full text-xs font-medium transition-colors ${!textMode ? "gradient-primary text-primary-foreground" : "text-muted-foreground"}`}
             >
               <Mic className="w-3 h-3" /> Voice
             </button>
             <button
-              onClick={() => { setTextMode(true); reset(); }}
+              onClick={() => {
+                setTextMode(true);
+                reset();
+              }}
               className={`flex items-center gap-1.5 px-3 h-8 rounded-full text-xs font-medium transition-colors ${textMode ? "gradient-primary text-primary-foreground" : "text-muted-foreground"}`}
             >
               <Keyboard className="w-3 h-3" /> Text
@@ -156,21 +190,39 @@ function Voice() {
         {!textMode ? (
           <>
             <div className="relative mx-auto w-44 h-44 grid place-items-center">
-              <div className={`absolute inset-0 rounded-full gradient-primary opacity-25 blur-2xl ${phase === "listening" ? "animate-pulse-glow" : ""}`} />
+              <div
+                className={`absolute inset-0 rounded-full gradient-primary opacity-25 blur-2xl ${phase === "listening" ? "animate-pulse-glow" : ""}`}
+              />
               <button
-                onClick={phase === "listening" ? stopListening : phase === "idle" || phase === "error" || phase === "ready" ? startListening : undefined}
+                onClick={
+                  phase === "listening"
+                    ? stopListening
+                    : phase === "idle" || phase === "error" || phase === "ready"
+                      ? startListening
+                      : undefined
+                }
                 aria-label={phase === "listening" ? "Stop recording" : "Start recording"}
                 className="relative w-32 h-32 rounded-full gradient-primary grid place-items-center glow-strong"
               >
-                {phase === "processing" ? <Loader2 className="w-12 h-12 text-primary-foreground animate-spin" />
-                  : phase === "listening" ? <Square className="w-10 h-10 text-primary-foreground" />
-                  : <Mic className="w-12 h-12 text-primary-foreground" />}
+                {phase === "processing" ? (
+                  <Loader2 className="w-12 h-12 text-primary-foreground animate-spin" />
+                ) : phase === "listening" ? (
+                  <Square className="w-10 h-10 text-primary-foreground" />
+                ) : (
+                  <Mic className="w-12 h-12 text-primary-foreground" />
+                )}
               </button>
             </div>
 
-            <p className={`mt-6 text-sm font-medium ${phase === "error" ? "text-destructive" : "text-primary"}`}>{status}</p>
+            <p
+              className={`mt-6 text-sm font-medium ${phase === "error" ? "text-destructive" : "text-primary"}`}
+            >
+              {status}
+            </p>
             <p className="text-xs text-muted-foreground mt-1">
-              {phase === "listening" ? "Speak clearly, then tap to stop" : "We process audio only when you tap"}
+              {phase === "listening"
+                ? "Speak clearly, then tap to stop"
+                : "We process audio only when you tap"}
             </p>
 
             {/* waveform */}
@@ -184,7 +236,8 @@ function Voice() {
                     style={{
                       height: `${h}px`,
                       opacity: phase === "listening" ? 0.4 + (i % 5) * 0.12 : 0.2,
-                      animation: phase === "listening" ? `pulse-glow 1.4s ${i * 0.05}s infinite` : undefined,
+                      animation:
+                        phase === "listening" ? `pulse-glow 1.4s ${i * 0.05}s infinite` : undefined,
                     }}
                   />
                 );
@@ -196,7 +249,12 @@ function Voice() {
             <textarea
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submitText(); } }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  submitText();
+                }
+              }}
               placeholder="e.g. Two eggs, toast with butter, black coffee…"
               rows={4}
               className="w-full rounded-2xl glass p-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none text-left"
@@ -206,9 +264,17 @@ function Voice() {
               disabled={!textInput.trim() || phase === "processing"}
               className="w-full h-12 rounded-xl gradient-primary text-primary-foreground font-semibold glow disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {phase === "processing" ? <><Loader2 className="w-4 h-4 animate-spin" /> Analysing…</> : "Analyse food"}
+              {phase === "processing" ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Analysing…
+                </>
+              ) : (
+                "Analyse food"
+              )}
             </button>
-            <p className="text-xs text-muted-foreground">Describe exactly what you ate including portions when possible.</p>
+            <p className="text-xs text-muted-foreground">
+              Describe exactly what you ate including portions when possible.
+            </p>
           </div>
         )}
 
@@ -222,7 +288,12 @@ function Voice() {
         {phase === "error" && (
           <div className="mt-4 glass-strong rounded-2xl p-4 text-center">
             <p className="text-xs text-muted-foreground">Try describing the meal more simply.</p>
-            <button onClick={reset} className="mt-2 h-10 px-4 rounded-full glass text-xs font-semibold">Retry</button>
+            <button
+              onClick={reset}
+              className="mt-2 h-10 px-4 rounded-full glass text-xs font-semibold"
+            >
+              Retry
+            </button>
           </div>
         )}
 
@@ -241,7 +312,10 @@ function Voice() {
                 <span className="text-xs tabular-nums text-muted-foreground">{x.kcal} kcal</span>
               </div>
             ))}
-            <button onClick={logAll} className="mt-3 w-full h-12 rounded-xl gradient-primary text-primary-foreground font-semibold glow">
+            <button
+              onClick={logAll}
+              className="mt-3 w-full h-12 rounded-xl gradient-primary text-primary-foreground font-semibold glow"
+            >
               Log all ({total} kcal)
             </button>
           </div>

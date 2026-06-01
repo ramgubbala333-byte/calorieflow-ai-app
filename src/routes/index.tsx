@@ -2,9 +2,31 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import {
-  Sparkles, Camera, Mic, Barcode, Dumbbell, ShieldCheck, ChevronRight,
-  Flame, Apple, Drumstick, Wheat, Droplet, Heart, Activity, Salad,
-  Cookie, Egg, Fish, Coffee, Pizza, Beef, Carrot, Star, Zap, Trophy,
+  Sparkles,
+  Camera,
+  Mic,
+  Barcode,
+  Dumbbell,
+  ShieldCheck,
+  ChevronRight,
+  Flame,
+  Apple,
+  Drumstick,
+  Wheat,
+  Droplet,
+  Heart,
+  Activity,
+  Salad,
+  Cookie,
+  Egg,
+  Fish,
+  Coffee,
+  Pizza,
+  Beef,
+  Carrot,
+  Star,
+  Zap,
+  Trophy,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -20,7 +42,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Premium AI calorie tracker and gym companion. Faster than MyFitnessPal, with privacy you control.",
+          "Premium AI calorie tracker and gym companion. Fast logging with privacy you control.",
       },
     ],
   }),
@@ -41,11 +63,11 @@ const FOOD_TICKER = [
 ];
 
 const STATS_TICKER = [
-  { i: Flame, t: "1.2M meals logged this week" },
-  { i: Activity, t: "98% scan accuracy" },
-  { i: Heart, t: "4.9 ★ App Store" },
-  { i: Zap, t: "Logs in under 2 seconds" },
-  { i: Trophy, t: "#1 trending health app" },
+  { i: Flame, t: "Log a meal in seconds" },
+  { i: Activity, t: "AI photo & voice logging" },
+  { i: Heart, t: "Indian & global foods" },
+  { i: Zap, t: "Accurate macro breakdowns" },
+  { i: Trophy, t: "Track goals & streaks" },
   { i: ShieldCheck, t: "Zero data sold. Ever." },
 ];
 
@@ -75,7 +97,9 @@ function Landing() {
               <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
               <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
             </div>
-            <span className="ml-2 font-display font-semibold tracking-tight text-sm">CalorieFlow</span>
+            <span className="ml-2 font-display font-semibold tracking-tight text-sm">
+              CalorieFlow
+            </span>
           </div>
           <Link
             to="/login"
@@ -90,7 +114,7 @@ function Landing() {
       <section className="px-4 pt-6 pb-5 animate-fade-up">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-chip text-[11px] text-muted-foreground mb-5">
           <Sparkles className="w-3.5 h-3.5 text-primary" />
-          AI-powered · Privacy first · v2.6
+          AI-powered · Privacy first · v1.0
         </div>
         <h1 className="text-[2.5rem] leading-[1.04] font-display font-bold tracking-tight">
           Calorie tracking
@@ -154,15 +178,25 @@ function Landing() {
             <div className="p-5">
               <div className="flex items-end justify-between">
                 <div>
-                  <div className="text-5xl font-bold gradient-text font-display tabular-nums leading-none">330</div>
+                  <div className="text-5xl font-bold gradient-text font-display tabular-nums leading-none">
+                    330
+                  </div>
                   <div className="text-[11px] text-muted-foreground mt-1.5">kcal remaining</div>
                 </div>
                 <div className="text-right text-[11px] text-muted-foreground space-y-0.5">
-                  <div className="tabular-nums">1,870 <span className="opacity-60">/ 2,200</span></div>
+                  <div className="tabular-nums">
+                    1,870 <span className="opacity-60">/ 2,200</span>
+                  </div>
                   <div className="flex gap-2 justify-end mt-1">
-                    <span className="flex items-center gap-0.5"><Drumstick className="w-3 h-3" /> 142g</span>
-                    <span className="flex items-center gap-0.5"><Wheat className="w-3 h-3" /> 168g</span>
-                    <span className="flex items-center gap-0.5"><Droplet className="w-3 h-3" /> 62g</span>
+                    <span className="flex items-center gap-0.5">
+                      <Drumstick className="w-3 h-3" /> 142g
+                    </span>
+                    <span className="flex items-center gap-0.5">
+                      <Wheat className="w-3 h-3" /> 168g
+                    </span>
+                    <span className="flex items-center gap-0.5">
+                      <Droplet className="w-3 h-3" /> 62g
+                    </span>
                   </div>
                 </div>
               </div>
@@ -178,7 +212,10 @@ function Landing() {
                   { i: Barcode, l: "Barcode" },
                   { i: Dumbbell, l: "Gym" },
                 ].map(({ i: I, l }) => (
-                  <div key={l} className="glass-chip rounded-xl py-2.5 grid place-items-center gap-1">
+                  <div
+                    key={l}
+                    className="glass-chip rounded-xl py-2.5 grid place-items-center gap-1"
+                  >
                     <I className="w-4 h-4 text-primary" />
                     <span className="font-medium">{l}</span>
                   </div>
@@ -194,7 +231,9 @@ function Landing() {
                   { e: "☕", n: "Oat latte", k: "120 kcal", t: "3:20 PM" },
                 ].map((m) => (
                   <div key={m.n} className="flex items-center gap-3 py-1.5">
-                    <div className="w-9 h-9 rounded-xl glass-chip grid place-items-center text-base">{m.e}</div>
+                    <div className="w-9 h-9 rounded-xl glass-chip grid place-items-center text-base">
+                      {m.e}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold truncate">{m.n}</p>
                       <p className="text-[10px] text-muted-foreground">{m.t}</p>
@@ -229,12 +268,35 @@ function Landing() {
       <section className="px-4 pb-8">
         <div className="glass-mac divide-y divide-white/10 dark:divide-white/10 overflow-hidden">
           {[
-            { i: Camera, t: "AI Food Scan", d: "Snap your plate. Calories & macros in 2s.", color: "var(--glow)" },
-            { i: Mic, t: "Voice Logging", d: "'Two eggs and toast' — done.", color: "var(--glow-2)" },
-            { i: Dumbbell, t: "Smart Gym Reminders", d: "Nudges that respect your schedule.", color: "var(--glow-3)" },
-            { i: ShieldCheck, t: "Privacy You Control", d: "Local-first. One-tap deletion.", color: "var(--glow-4)" },
+            {
+              i: Camera,
+              t: "AI Food Scan",
+              d: "Snap your plate. Calories & macros in 2s.",
+              color: "var(--glow)",
+            },
+            {
+              i: Mic,
+              t: "Voice Logging",
+              d: "'Two eggs and toast' — done.",
+              color: "var(--glow-2)",
+            },
+            {
+              i: Dumbbell,
+              t: "Smart Gym Reminders",
+              d: "Nudges that respect your schedule.",
+              color: "var(--glow-3)",
+            },
+            {
+              i: ShieldCheck,
+              t: "Privacy You Control",
+              d: "Local-first. One-tap deletion.",
+              color: "var(--glow-4)",
+            },
           ].map(({ i: I, t, d, color }) => (
-            <div key={t} className="flex items-center gap-3 p-4 hover:bg-foreground/5 transition-colors">
+            <div
+              key={t}
+              className="flex items-center gap-3 p-4 hover:bg-foreground/5 transition-colors"
+            >
               <div
                 className="w-10 h-10 rounded-xl grid place-items-center shrink-0"
                 style={{ background: `color-mix(in oklch, ${color} 22%, transparent)`, color }}
@@ -256,7 +318,26 @@ function Landing() {
         <div className="marquee-mask overflow-hidden">
           <div className="flex gap-3 w-max animate-marquee-slow">
             {[...Array(2)].flatMap((_, k) =>
-              ["🥑","🍳","🥗","🍗","🍌","🥪","🍣","☕","🥣","🍕","🍎","🥥","🧀","🥕","🍇","🍓","🌮","🍜"].map((e, i) => (
+              [
+                "🥑",
+                "🍳",
+                "🥗",
+                "🍗",
+                "🍌",
+                "🥪",
+                "🍣",
+                "☕",
+                "🥣",
+                "🍕",
+                "🍎",
+                "🥥",
+                "🧀",
+                "🥕",
+                "🍇",
+                "🍓",
+                "🌮",
+                "🍜",
+              ].map((e, i) => (
                 <div
                   key={`${k}-${i}`}
                   className="glass-chip w-12 h-12 rounded-2xl grid place-items-center text-2xl shrink-0"
@@ -290,7 +371,10 @@ function Landing() {
       </section>
 
       <footer className="px-5 pb-10 text-center text-[11px] text-muted-foreground">
-        © 2026 CalorieFlow AI · <Link to="/settings" className="underline">Privacy</Link>
+        © 2026 CalorieFlow AI ·{" "}
+        <Link to="/settings" className="underline">
+          Privacy
+        </Link>
       </footer>
     </div>
   );

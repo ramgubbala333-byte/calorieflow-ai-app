@@ -147,7 +147,14 @@ export function saveTemplate(name: string, meals: Meal[]) {
   return t;
 }
 
-export type FavoriteFood = { name: string; serving: string; kcal: number; p: number; c: number; f: number };
+export type FavoriteFood = {
+  name: string;
+  serving: string;
+  kcal: number;
+  p: number;
+  c: number;
+  f: number;
+};
 export function getFavorites(): FavoriteFood[] {
   return read<FavoriteFood[]>(KEYS.favorites, []);
 }
@@ -174,6 +181,7 @@ export function setGoals(g: Goals) {
 export type Profile = {
   name?: string;
   email?: string;
+  avatarUrl?: string;
   heightCm?: number;
   weightKg?: number;
   age?: number;
@@ -189,6 +197,37 @@ export function setProfile(p: Profile) {
   pushProfile(p);
 }
 
+/**
+ * Merge identity fields (name/email/avatar) coming from the auth provider
+ * — e.g. Google sign-in — into the stored profile. User-edited values win:
+ * we only fill fields that are currently empty, but always keep email/avatar
+ * fresh from the provider. Returns true if anything changed.
+ */
+export function mergeIdentity(identity: {
+  name?: string;
+  email?: string;
+  avatarUrl?: string;
+}): boolean {
+  const cur = getProfile();
+  const next: Profile = { ...cur };
+  let changed = false;
+
+  if (identity.name && !cur.name) {
+    next.name = identity.name;
+    changed = true;
+  }
+  if (identity.email && cur.email !== identity.email) {
+    next.email = identity.email;
+    changed = true;
+  }
+  if (identity.avatarUrl && cur.avatarUrl !== identity.avatarUrl) {
+    next.avatarUrl = identity.avatarUrl;
+    changed = true;
+  }
+  if (changed) setProfile(next);
+  return changed;
+}
+
 export function isOnboarded(): boolean {
   return read<boolean>(KEYS.onboarded, false);
 }
@@ -199,7 +238,11 @@ export function setOnboarded(v: boolean) {
 
 // ---------- Subscription ----------
 
-export type SubscriptionState = { tier: string; status: string; currentPeriodEnd: string | null } | null;
+export type SubscriptionState = {
+  tier: string;
+  status: string;
+  currentPeriodEnd: string | null;
+} | null;
 export function getSubscription(): SubscriptionState {
   return read<SubscriptionState>(KEYS.subscription, null);
 }
