@@ -28,6 +28,18 @@ import {
   Zap,
   Trophy,
 } from "lucide-react";
+import foodThali from "@/assets/food-thali.jpg";
+import foodDosa from "@/assets/food-dosa.jpg";
+import foodTandoori from "@/assets/food-tandoori.jpg";
+import foodPoha from "@/assets/food-poha.jpg";
+
+const FEATURED_MEALS = [
+  { img: foodThali, name: "Paneer Thali", kcal: 640, sub: "Lunch · 32g protein" },
+  { img: foodTandoori, name: "Tandoori Chicken", kcal: 290, sub: "Dinner · 38g protein" },
+  { img: foodDosa, name: "Masala Dosa", kcal: 168, sub: "Breakfast · 4g protein" },
+  { img: foodPoha, name: "Poha & Chai", kcal: 380, sub: "Breakfast · 9g protein" },
+];
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -265,8 +277,40 @@ function Landing() {
         </div>
       </section>
 
+      {/* Featured Indian meals gallery */}
+      <section className="px-4 pb-8">
+        <div className="flex items-baseline justify-between mb-3">
+          <h2 className="text-lg font-semibold tracking-tight">Today's picks</h2>
+          <span className="text-[11px] text-muted-foreground">Indian cuisine</span>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {FEATURED_MEALS.map((m) => (
+            <div key={m.name} className="glass-mac overflow-hidden rounded-2xl">
+              <div className="aspect-square overflow-hidden">
+                <img
+                  src={m.img}
+                  alt={m.name}
+                  loading="lazy"
+                  width={768}
+                  height={768}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <div className="flex items-baseline justify-between gap-2">
+                  <h3 className="text-[13px] font-semibold truncate">{m.name}</h3>
+                  <span className="text-[11px] font-semibold tabular-nums text-primary">{m.kcal} kcal</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{m.sub}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Features — macOS list */}
       <section className="px-4 pb-8">
+
         <div className="glass-mac divide-y divide-white/10 dark:divide-white/10 overflow-hidden">
           {[
             {
