@@ -278,7 +278,7 @@ function Landing() {
             {
               i: Mic,
               t: "Voice Logging",
-              d: "'Two eggs and toast' — done.",
+              d: "'2 rotis and dal' — done.",
               color: "var(--glow-2)",
             },
             {
