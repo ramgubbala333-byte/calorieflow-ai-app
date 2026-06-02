@@ -308,6 +308,23 @@ function Landing() {
         </div>
       </section>
 
+      {/* Activity & streaks entry */}
+      <section className="px-4 pb-8">
+        <Link to="/activity" className="block glass-strong rounded-3xl p-5 relative overflow-hidden">
+          <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-orange-500/25 blur-3xl" />
+          <div className="relative flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl grid place-items-center bg-gradient-to-br from-orange-500 to-rose-500 text-3xl glow">🔥</div>
+            <div className="flex-1">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-orange-400">Streak alive</p>
+              <h3 className="text-base font-semibold">Close your rings today</h3>
+              <p className="text-[11px] text-muted-foreground">Steps · Active min · Calories — earn awards for streaks</p>
+            </div>
+            <span className="text-xs font-semibold text-primary">Open →</span>
+          </div>
+        </Link>
+      </section>
+
+
       {/* Features — macOS list */}
       <section className="px-4 pb-8">
 
