@@ -17,14 +17,15 @@ const plans = [
   {
     id: "monthly",
     name: "Monthly",
-    price: "$4.99",
+    price: "₹399",
     sub: "/month",
     note: "Cancel anytime",
   },
   {
     id: "yearly",
     name: "Yearly",
-    price: "$39",
+    price: "₹2,999",
+
     sub: "/year",
     note: "Save 34% · best value",
     best: true,
