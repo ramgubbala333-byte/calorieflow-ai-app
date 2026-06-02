@@ -42,9 +42,10 @@ function ActivityPage() {
           <button className="w-9 h-9 rounded-full glass grid place-items-center"><ChevronLeft className="w-4 h-4" /></button>
           <div className="glass-strong rounded-full px-4 h-9 flex items-center gap-2">
             <Calendar className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-semibold tracking-wider uppercase">
+            <span className="text-xs font-semibold tracking-wider uppercase" suppressHydrationWarning>
               {new Date(today.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
             </span>
+
           </div>
           <button className="w-9 h-9 rounded-full glass grid place-items-center"><ChevronRight className="w-4 h-4" /></button>
         </div>
