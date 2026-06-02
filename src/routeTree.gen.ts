@@ -30,6 +30,7 @@ import { Route as CoachRouteImport } from './routes/coach'
 import { Route as BarcodeRouteImport } from './routes/barcode'
 import { Route as AuthCallbackRouteImport } from './routes/auth-callback'
 import { Route as AddFoodRouteImport } from './routes/add-food'
+import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as IndexRouteImport } from './routes/index'
 
 const WorkoutRoute = WorkoutRouteImport.update({
@@ -137,6 +138,11 @@ const AddFoodRoute = AddFoodRouteImport.update({
   path: '/add-food',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ActivityRoute = ActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -145,6 +151,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/activity': typeof ActivityRoute
   '/add-food': typeof AddFoodRoute
   '/auth-callback': typeof AuthCallbackRoute
   '/barcode': typeof BarcodeRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/activity': typeof ActivityRoute
   '/add-food': typeof AddFoodRoute
   '/auth-callback': typeof AuthCallbackRoute
   '/barcode': typeof BarcodeRoute
@@ -194,6 +202,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/activity': typeof ActivityRoute
   '/add-food': typeof AddFoodRoute
   '/auth-callback': typeof AuthCallbackRoute
   '/barcode': typeof BarcodeRoute
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/activity'
     | '/add-food'
     | '/auth-callback'
     | '/barcode'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/activity'
     | '/add-food'
     | '/auth-callback'
     | '/barcode'
@@ -268,6 +279,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/activity'
     | '/add-food'
     | '/auth-callback'
     | '/barcode'
@@ -293,6 +305,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ActivityRoute: typeof ActivityRoute
   AddFoodRoute: typeof AddFoodRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BarcodeRoute: typeof BarcodeRoute
@@ -465,6 +478,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AddFoodRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/activity': {
+      id: '/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof ActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -477,6 +497,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ActivityRoute: ActivityRoute,
   AddFoodRoute: AddFoodRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BarcodeRoute: BarcodeRoute,
