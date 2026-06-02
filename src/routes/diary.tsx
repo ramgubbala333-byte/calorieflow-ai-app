@@ -130,8 +130,9 @@ function Diary() {
   const copyYesterday = () => {
     // Seed-style example: re-add 2 staple meals if today is empty.
     const yesterdays: Omit<Meal, "id">[] = [
-      { name: "Greek Yogurt Bowl", type: "Breakfast", time: "07:42", calories: 380, protein: 28, carbs: 42, fat: 9, emoji: "🥣" },
-      { name: "Grilled Chicken Salad", type: "Lunch", time: "12:35", calories: 520, protein: 44, carbs: 28, fat: 22, emoji: "🥗" },
+      { name: "Masala Poha", type: "Breakfast", time: "07:42", calories: 380, protein: 9, carbs: 62, fat: 11, emoji: "🍛" },
+      { name: "Paneer Tikka Salad", type: "Lunch", time: "12:35", calories: 520, protein: 32, carbs: 28, fat: 28, emoji: "🥗" },
+
     ];
     yesterdays.forEach((m) => storeAddMeal(m));
     toast.success("Copied yesterday's meals", { description: `${yesterdays.length} entries added` });
