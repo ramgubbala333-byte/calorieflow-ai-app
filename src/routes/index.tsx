@@ -361,7 +361,7 @@ function Landing() {
             <Star className="w-3 h-3 text-[var(--glow-4)] fill-[var(--glow-4)]" /> Pro
           </div>
           <h3 className="font-display text-2xl font-semibold">Unlimited AI scans</h3>
-          <p className="text-xs text-muted-foreground mt-1">$4.99/mo · cancel anytime</p>
+          <p className="text-xs text-muted-foreground mt-1">₹399/mo · cancel anytime</p>
           <Link
             to="/subscription"
             className="mt-4 inline-flex h-11 px-6 items-center rounded-full gradient-primary text-primary-foreground text-sm font-semibold glow"
