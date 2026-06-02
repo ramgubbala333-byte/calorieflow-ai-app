@@ -12,11 +12,12 @@ export type Meal = {
 };
 
 export const todayMeals: Meal[] = [
-  { id: "1", name: "Greek Yogurt Bowl", type: "Breakfast", time: "07:42", calories: 380, protein: 28, carbs: 42, fat: 9, emoji: "🥣" },
-  { id: "2", name: "Cold Brew + Oat Milk", type: "Breakfast", time: "08:15", calories: 90, protein: 2, carbs: 12, fat: 3, emoji: "☕" },
-  { id: "3", name: "Grilled Chicken Salad", type: "Lunch", time: "12:35", calories: 520, protein: 44, carbs: 28, fat: 22, emoji: "🥗" },
-  { id: "4", name: "Protein Smoothie", type: "Snack", time: "16:10", calories: 240, protein: 26, carbs: 22, fat: 4, emoji: "🥤" },
-  { id: "5", name: "Salmon, Rice & Greens", type: "Dinner", time: "19:25", calories: 640, protein: 42, carbs: 58, fat: 24, emoji: "🍣" },
+  { id: "1", name: "Masala Poha", type: "Breakfast", time: "07:42", calories: 380, protein: 9, carbs: 62, fat: 11, emoji: "🍛" },
+  { id: "2", name: "Masala Chai", type: "Breakfast", time: "08:15", calories: 90, protein: 3, carbs: 12, fat: 3, emoji: "🍵" },
+  { id: "3", name: "Paneer Tikka Salad", type: "Lunch", time: "12:35", calories: 520, protein: 32, carbs: 28, fat: 28, emoji: "🥗" },
+  { id: "4", name: "Lassi (Protein)", type: "Snack", time: "16:10", calories: 240, protein: 18, carbs: 26, fat: 6, emoji: "🥤" },
+  { id: "5", name: "Dal, Roti & Sabzi", type: "Dinner", time: "19:25", calories: 640, protein: 26, carbs: 84, fat: 18, emoji: "🍲" },
+
 ];
 
 export const goals = {
