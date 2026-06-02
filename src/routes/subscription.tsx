@@ -17,14 +17,15 @@ const plans = [
   {
     id: "monthly",
     name: "Monthly",
-    price: "$4.99",
+    price: "₹399",
     sub: "/month",
     note: "Cancel anytime",
   },
   {
     id: "yearly",
     name: "Yearly",
-    price: "$39",
+    price: "₹2,999",
+
     sub: "/year",
     note: "Save 34% · best value",
     best: true,
@@ -186,7 +187,7 @@ function Subscription() {
         </button>
 
         <p className="mt-3 text-center text-[11px] text-muted-foreground">
-          Then {picked === "yearly" ? "$39/year" : "$4.99/month"}. Auto-renews. Manage anytime in Settings.
+          Then {picked === "yearly" ? "₹2,999/year" : "₹399/month"}. Auto-renews. Manage anytime in Settings.
         </p>
 
         <div className="mt-5 flex items-center justify-center gap-4 text-[11px] text-muted-foreground pb-8">

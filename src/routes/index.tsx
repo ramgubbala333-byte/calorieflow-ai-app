@@ -50,17 +50,18 @@ export const Route = createFileRoute("/")({
 });
 
 const FOOD_TICKER = [
-  { e: "🥑", t: "Avocado · 240 kcal" },
-  { e: "🍳", t: "Eggs (2) · 156 kcal" },
-  { e: "🥗", t: "Caesar salad · 320 kcal" },
-  { e: "🍗", t: "Grilled chicken · 284 kcal" },
+  { e: "🍛", t: "Paneer butter masala · 340 kcal" },
+  { e: "🫓", t: "Roti (2) · 240 kcal" },
+  { e: "🍚", t: "Jeera rice · 205 kcal" },
+  { e: "🥘", t: "Chicken curry · 290 kcal" },
+  { e: "🍵", t: "Masala chai · 90 kcal" },
+  { e: "🥞", t: "Masala dosa · 168 kcal" },
+  { e: "🍲", t: "Dal tadka · 198 kcal" },
+  { e: "🥗", t: "Sprouts chaat · 150 kcal" },
+  { e: "🥛", t: "Lassi · 180 kcal" },
   { e: "🍌", t: "Banana · 105 kcal" },
-  { e: "🥪", t: "Turkey sandwich · 380 kcal" },
-  { e: "🍣", t: "Salmon nigiri · 220 kcal" },
-  { e: "☕", t: "Oat latte · 120 kcal" },
-  { e: "🥣", t: "Greek yogurt · 150 kcal" },
-  { e: "🍕", t: "Pepperoni slice · 298 kcal" },
 ];
+
 
 const STATS_TICKER = [
   { i: Flame, t: "Log a meal in seconds" },
@@ -277,7 +278,7 @@ function Landing() {
             {
               i: Mic,
               t: "Voice Logging",
-              d: "'Two eggs and toast' — done.",
+              d: "'2 rotis and dal' — done.",
               color: "var(--glow-2)",
             },
             {
