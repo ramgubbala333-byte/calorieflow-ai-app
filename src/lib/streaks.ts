@@ -133,8 +133,11 @@ export const getWorkoutCount = (): number => read(KEYS.workouts, 0);
 
 export function getToday(): DayProgress {
   const t = todayStr();
-  const found = getHistory().find((d) => d.date === t);
-  return found ?? { date: t, steps: 0, activeMinutes: 0, activityCalories: 0, completed: false };
+  const hist = getHistory();
+  return memo("today", [hist, t], () => {
+    const found = hist.find((d) => d.date === t);
+    return found ?? { date: t, steps: 0, activeMinutes: 0, activityCalories: 0, completed: false };
+  });
 }
 
 export function getCurrentStreak(): number {
