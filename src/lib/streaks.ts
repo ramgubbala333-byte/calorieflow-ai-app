@@ -57,20 +57,38 @@ const defaultGoals: DailyGoals = { steps: 8000, activeMinutes: 30, activityCalor
 
 const isBrowser = typeof window !== "undefined";
 const listeners = new Set<() => void>();
+const parsedCache = new Map<string, { raw: string | null; value: unknown }>();
+const derivedCache = new Map<string, { deps: unknown; value: unknown }>();
 
 function read<T>(key: string, fallback: T): T {
   if (!isBrowser) return fallback;
   try {
     const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
+    const cached = parsedCache.get(key);
+    if (cached && cached.raw === raw) return cached.value as T;
+    const value = raw ? (JSON.parse(raw) as T) : fallback;
+    parsedCache.set(key, { raw, value });
+    return value;
   } catch { return fallback; }
 }
 function write<T>(key: string, value: T) {
   if (!isBrowser) return;
-  localStorage.setItem(key, JSON.stringify(value));
+  const raw = JSON.stringify(value);
+  localStorage.setItem(key, raw);
+  parsedCache.set(key, { raw, value });
+  derivedCache.clear();
   listeners.forEach((l) => l());
 }
 function subscribe(cb: () => void) { listeners.add(cb); return () => listeners.delete(cb); }
+
+// Memoize derived selectors so useSyncExternalStore sees stable references.
+function memo<T>(key: string, deps: unknown, compute: () => T): T {
+  const cached = derivedCache.get(key);
+  if (cached && JSON.stringify(cached.deps) === JSON.stringify(deps)) return cached.value as T;
+  const value = compute();
+  derivedCache.set(key, { deps, value });
+  return value;
+}
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 function daysBetween(a: string, b: string) {
