@@ -28,6 +28,18 @@ import {
   Zap,
   Trophy,
 } from "lucide-react";
+import foodThali from "@/assets/food-thali.jpg";
+import foodDosa from "@/assets/food-dosa.jpg";
+import foodTandoori from "@/assets/food-tandoori.jpg";
+import foodPoha from "@/assets/food-poha.jpg";
+
+const FEATURED_MEALS = [
+  { img: foodThali, name: "Paneer Thali", kcal: 640, sub: "Lunch · 32g protein" },
+  { img: foodTandoori, name: "Tandoori Chicken", kcal: 290, sub: "Dinner · 38g protein" },
+  { img: foodDosa, name: "Masala Dosa", kcal: 168, sub: "Breakfast · 4g protein" },
+  { img: foodPoha, name: "Poha & Chai", kcal: 380, sub: "Breakfast · 9g protein" },
+];
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
