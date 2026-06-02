@@ -82,14 +82,17 @@ export const streaks = {
 export const coachMessages = [
   { role: "coach" as const, text: "Morning! You hit your protein 5 days in a row 💪 Want me to plan today's meals around 165g protein?" },
   { role: "user" as const, text: "Yes, but keep dinner under 700 kcal." },
-  { role: "coach" as const, text: "Got it. I'll suggest a salmon bowl (640 kcal, 42g protein) and a Greek yogurt snack to hit your macros." },
+  { role: "coach" as const, text: "Got it. I'll suggest grilled tandoori chicken with jeera rice (640 kcal, 42g protein) and a small bowl of dahi to hit your macros." },
 ];
 
 export const foodSearchResults = [
-  { name: "Chicken Breast, grilled", serving: "100 g", kcal: 165, p: 31, c: 0, f: 3.6 },
-  { name: "Brown Rice, cooked", serving: "1 cup", kcal: 216, p: 5, c: 45, f: 1.8 },
-  { name: "Avocado", serving: "1/2 medium", kcal: 160, p: 2, c: 9, f: 15 },
-  { name: "Egg, whole", serving: "1 large", kcal: 72, p: 6, c: 0.4, f: 5 },
+  { name: "Tandoori Chicken", serving: "100 g", kcal: 175, p: 28, c: 2, f: 6 },
+  { name: "Basmati Rice, cooked", serving: "1 cup", kcal: 205, p: 4.3, c: 45, f: 0.4 },
+  { name: "Roti (Whole Wheat)", serving: "1 medium", kcal: 120, p: 3.5, c: 22, f: 2.5 },
+  { name: "Paneer", serving: "50 g", kcal: 130, p: 9, c: 1.2, f: 10 },
+  { name: "Dal Tadka", serving: "1 cup", kcal: 198, p: 11, c: 28, f: 5 },
+  { name: "Idli", serving: "2 pieces", kcal: 78, p: 3, c: 16, f: 0.4 },
+  { name: "Masala Dosa", serving: "1 medium", kcal: 168, p: 4, c: 29, f: 4 },
   { name: "Banana", serving: "1 medium", kcal: 105, p: 1.3, c: 27, f: 0.4 },
-  { name: "Almonds", serving: "28 g", kcal: 164, p: 6, c: 6, f: 14 },
+
 ];
