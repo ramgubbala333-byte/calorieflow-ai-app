@@ -1,5 +1,6 @@
 {
   "name": "tanstack_start_ts",
+  "description": "CalorieFlow AI: an AI calorie and nutrition tracker with photo, voice, and barcode meal logging, built with TanStack Start, Supabase, and Cloudflare Workers.",
   "private": true,
   "sideEffects": false,
   "type": "module",
